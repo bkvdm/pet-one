@@ -3,6 +3,7 @@ package tel.bvm.pet.model;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name = "volunteers")
 public class Volunteers {
@@ -73,5 +74,29 @@ public class Volunteers {
 
     public void setContact(String contact) {
         this.contact = contact;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Volunteers that = (Volunteers) o;
+        return id == that.id && chatId == that.chatId && Objects.equals(clients, that.clients) && Objects.equals(name, that.name) && Objects.equals(contact, that.contact);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clients, id, chatId, name, contact);
+    }
+
+    @Override
+    public String toString() {
+        return "Volunteers{" +
+                "clients=" + clients +
+                ", id=" + id +
+                ", chatId=" + chatId +
+                ", name='" + name + '\'' +
+                ", contact='" + contact + '\'' +
+                '}';
     }
 }

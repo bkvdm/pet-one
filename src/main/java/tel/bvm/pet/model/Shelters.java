@@ -3,6 +3,8 @@ package tel.bvm.pet.model;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
+
 @Entity(name = "shelter")
 public class Shelters {
     @OneToMany(mappedBy = "shelter")
@@ -101,5 +103,32 @@ public class Shelters {
 
     public void setSecurity_contact(String security_contact) {
         this.security_contact = security_contact;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Shelters shelters = (Shelters) o;
+        return id == shelters.id && Objects.equals(animal, shelters.animal) && Objects.equals(name, shelters.name) && Objects.equals(operationMode, shelters.operationMode) && Objects.equals(contact, shelters.contact) && Objects.equals(address, shelters.address) && Objects.equals(drillingDirector, shelters.drillingDirector) && Objects.equals(security_contact, shelters.security_contact);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(animal, id, name, operationMode, contact, address, drillingDirector, security_contact);
+    }
+
+    @Override
+    public String toString() {
+        return "Shelters{" +
+                "animal=" + animal +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", operationMode='" + operationMode + '\'' +
+                ", contact='" + contact + '\'' +
+                ", address='" + address + '\'' +
+                ", drillingDirector='" + drillingDirector + '\'' +
+                ", security_contact='" + security_contact + '\'' +
+                '}';
     }
 }

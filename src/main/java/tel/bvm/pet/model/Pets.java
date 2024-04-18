@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name = "pets")
 public class Pets {
@@ -96,5 +97,29 @@ public class Pets {
         this.dateTake = dateTake;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pets pets = (Pets) o;
+        return id == pets.id && Objects.equals(shelter, pets.shelter) && Objects.equals(dailyReport, pets.dailyReport) && Objects.equals(name, pets.name) && Objects.equals(type, pets.type) && Objects.equals(busyFree, pets.busyFree) && Objects.equals(dateTake, pets.dateTake);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(shelter, dailyReport, id, name, type, busyFree, dateTake);
+    }
+
+    @Override
+    public String toString() {
+        return "Pets{" +
+                "shelter=" + shelter +
+                ", dailyReport=" + dailyReport +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", busyFree=" + busyFree +
+                ", dateTake=" + dateTake +
+                '}';
+    }
 }

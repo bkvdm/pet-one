@@ -2,6 +2,8 @@ package tel.bvm.pet.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity(name = "clients")
 public class Clients {
     @ManyToOne
@@ -73,5 +75,27 @@ public class Clients {
         this.contact = contact;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Clients clients = (Clients) o;
+        return id == clients.id && chatId == clients.chatId && Objects.equals(volunteer, clients.volunteer) && Objects.equals(name, clients.name) && Objects.equals(contact, clients.contact);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(volunteer, id, chatId, name, contact);
+    }
+
+    @Override
+    public String toString() {
+        return "Clients{" +
+                "volunteer=" + volunteer +
+                ", id=" + id +
+                ", chatId=" + chatId +
+                ", name='" + name + '\'' +
+                ", contact='" + contact + '\'' +
+                '}';
+    }
 }

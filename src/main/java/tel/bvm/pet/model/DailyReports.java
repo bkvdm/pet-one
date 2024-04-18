@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Entity(name = "daily_report")
 public class DailyReports {
@@ -100,5 +102,31 @@ public class DailyReports {
 
     public void setIs_check(Boolean is_check) {
         this.is_check = is_check;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DailyReports that = (DailyReports) o;
+        return idDailyReport == that.idDailyReport && Objects.equals(pet, that.pet) && Objects.equals(dateTime, that.dateTime) && Objects.equals(well, that.well) && Objects.equals(reaction, that.reaction) && Objects.deepEquals(data, that.data) && Objects.equals(is_check, that.is_check);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pet, idDailyReport, dateTime, well, reaction, Arrays.hashCode(data), is_check);
+    }
+
+    @Override
+    public String toString() {
+        return "DailyReports{" +
+                "pet=" + pet +
+                ", idDailyReport=" + idDailyReport +
+                ", dateTime=" + dateTime +
+                ", well='" + well + '\'' +
+                ", reaction='" + reaction + '\'' +
+                ", data=" + Arrays.toString(data) +
+                ", is_check=" + is_check +
+                '}';
     }
 }
