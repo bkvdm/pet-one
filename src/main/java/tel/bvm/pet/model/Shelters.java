@@ -8,7 +8,7 @@ import java.util.Objects;
 @Entity(name = "shelter")
 public class Shelters {
     @OneToMany(mappedBy = "shelter")
-    private List<Pets> animal;
+    private List<Pets> pet;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_shelter")
@@ -26,8 +26,8 @@ public class Shelters {
     @Column(name = "security_contact")
     private String security_contact;
 
-    public Shelters(List<Pets> animal, long id, String name, String operationMode, String contact, String address, String drillingDirector, String security_contact) {
-        this.animal = animal;
+    public Shelters(List<Pets> pet, long id, String name, String operationMode, String contact, String address, String drillingDirector, String security_contact) {
+        this.pet = pet;
         this.id = id;
         this.name = name;
         this.operationMode = operationMode;
@@ -41,12 +41,12 @@ public class Shelters {
 
     }
 
-    public List<Pets> getAnimal() {
-        return animal;
+    public List<Pets> getPet() {
+        return pet;
     }
 
-    public void setAnimal(List<Pets> animal) {
-        this.animal = animal;
+    public void setPet(List<Pets> pet) {
+        this.pet = pet;
     }
 
     public long getId() {
@@ -110,18 +110,18 @@ public class Shelters {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Shelters shelters = (Shelters) o;
-        return id == shelters.id && Objects.equals(animal, shelters.animal) && Objects.equals(name, shelters.name) && Objects.equals(operationMode, shelters.operationMode) && Objects.equals(contact, shelters.contact) && Objects.equals(address, shelters.address) && Objects.equals(drillingDirector, shelters.drillingDirector) && Objects.equals(security_contact, shelters.security_contact);
+        return id == shelters.id && Objects.equals(pet, shelters.pet) && Objects.equals(name, shelters.name) && Objects.equals(operationMode, shelters.operationMode) && Objects.equals(contact, shelters.contact) && Objects.equals(address, shelters.address) && Objects.equals(drillingDirector, shelters.drillingDirector) && Objects.equals(security_contact, shelters.security_contact);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(animal, id, name, operationMode, contact, address, drillingDirector, security_contact);
+        return Objects.hash(pet, id, name, operationMode, contact, address, drillingDirector, security_contact);
     }
 
     @Override
     public String toString() {
         return "Shelters{" +
-                "animal=" + animal +
+                "pet=" + pet +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", operationMode='" + operationMode + '\'' +

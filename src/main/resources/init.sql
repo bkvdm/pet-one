@@ -2,16 +2,16 @@
 --changeset bkvdm:1
 CREATE TABLE daily_report (
   id_daily_report BIGINT PRIMARY KEY AUTO_INCREMENT,
-  id_animal BIGINT,
+  id_pet BIGINT,
   date_time TIMESTAMP NOT NULL,
   well VARCHAR(255),
   reaction VARCHAR(255),
-  foto_animal BLOB,
+  foto_pet BLOB,
   is_check BOOLEAN NOT NULL,
-  FOREIGN KEY (id_animal) REFERENCES Animals(id_animal)
+  FOREIGN KEY (id_pet) REFERENCES Pets(id_pet)
 );
-CREATE TABLE animals (
-  id_animal BIGINT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE pets (
+  id_pet BIGINT PRIMARY KEY AUTO_INCREMENT,
   id_shelter BIGINT,
   name VARCHAR(255),
   type VARCHAR(255),
