@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,8 +27,11 @@ public class Pets {
     private Boolean busyFree;
     @Column(name = "date_take")
     private LocalDateTime dateTake;
+    @Lob
+    @Column(name = "data_present")
+    private byte[] dataPresent;
 
-    public Pets(Shelters shelter, List<DailyReports> dailyReport, long id, String name, String type, Boolean busyFree, LocalDateTime dateTake) {
+    public Pets(Shelters shelter, List<DailyReports> dailyReport, long id, String name, String type, Boolean busyFree, LocalDateTime dateTake, byte[] dataPresent) {
         this.shelter = shelter;
         this.dailyReport = dailyReport;
         this.id = id;
@@ -35,10 +39,7 @@ public class Pets {
         this.type = type;
         this.busyFree = busyFree;
         this.dateTake = dateTake;
-    }
-
-    public Pets() {
-
+        this.dataPresent = dataPresent;
     }
 
     public Shelters getShelter() {
@@ -97,17 +98,25 @@ public class Pets {
         this.dateTake = dateTake;
     }
 
+    public byte[] getDataPresent() {
+        return dataPresent;
+    }
+
+    public void setDataPresent(byte[] dataPresent) {
+        this.dataPresent = dataPresent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pets pets = (Pets) o;
-        return id == pets.id && Objects.equals(shelter, pets.shelter) && Objects.equals(dailyReport, pets.dailyReport) && Objects.equals(name, pets.name) && Objects.equals(type, pets.type) && Objects.equals(busyFree, pets.busyFree) && Objects.equals(dateTake, pets.dateTake);
+        return id == pets.id && Objects.equals(shelter, pets.shelter) && Objects.equals(dailyReport, pets.dailyReport) && Objects.equals(name, pets.name) && Objects.equals(type, pets.type) && Objects.equals(busyFree, pets.busyFree) && Objects.equals(dateTake, pets.dateTake) && Objects.deepEquals(dataPresent, pets.dataPresent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(shelter, dailyReport, id, name, type, busyFree, dateTake);
+        return Objects.hash(shelter, dailyReport, id, name, type, busyFree, dateTake, Arrays.hashCode(dataPresent));
     }
 
     @Override
@@ -120,6 +129,7 @@ public class Pets {
                 ", type='" + type + '\'' +
                 ", busyFree=" + busyFree +
                 ", dateTake=" + dateTake +
+                ", dataPresent=" + Arrays.toString(dataPresent) +
                 '}';
     }
 }

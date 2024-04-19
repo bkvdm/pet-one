@@ -17,6 +17,7 @@ CREATE TABLE pets (
   type VARCHAR(255),
   busy_free BOOLEAN NOT NULL,
   date_take TIMESTAMP,
+  data_present LONGBLOB,
   FOREIGN KEY (id_shelter) REFERENCES Shelters(id_shelter)
 );
 CREATE TABLE clients (
