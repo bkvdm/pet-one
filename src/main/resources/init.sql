@@ -30,7 +30,7 @@ CREATE TABLE pets
     id_pet      BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_shelter  BIGINT,
     id_client   BIGINT,
-    id_view_pet BIGINT NOT NULL,
+    id_view_pet BIGINT  NOT NULL,
     name_pet    VARCHAR(255),
     busy_free   BOOLEAN NOT NULL,
     date_take   TIMESTAMP,
@@ -58,4 +58,22 @@ CREATE TABLE volunteers
     chat_id        BIGINT NOT NULL,
     name_volunteer VARCHAR(255),
     contact        VARCHAR(255)
+);
+
+CREATE TABLE forms
+(
+    id_form         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    file_path       VARCHAR(255) NOT NULL,
+    file_size       BIGINT       NOT NULL,
+    media_type      VARCHAR(255) NOT NULL,
+    data_form       LONGBLOB     NOT NULL,
+    content_form_id BIGINT,
+    UNIQUE (content_form_id),
+    FOREIGN KEY (content_form_id) REFERENCES content_forms (id_content)
+);
+
+CREATE TABLE content_forms
+(
+    id_content BIGINT AUTO_INCREMENT PRIMARY KEY,
+    content    TEXT NOT NULL
 );
