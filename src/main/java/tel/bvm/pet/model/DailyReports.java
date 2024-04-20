@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 
-@Entity(name = "daily_report")
+@Entity(name = "daily_reports")
 public class DailyReports {
     @ManyToOne
     @JsonIgnore
@@ -28,24 +28,23 @@ public class DailyReports {
     private String reaction;
 
     @Lob
-    @Column(name = "foto_pet")
-    private byte[] data;
+    @Column(name = "picture_daily_report")
+    private byte[] pictureDailyReport;
 
     @Column(name = "is_check", nullable = false)
     private Boolean is_check;
 
-    public DailyReports(Pets pet, long idDailyReport, LocalDateTime dateTime, String well, String reaction, byte[] data, Boolean is_check) {
+    public DailyReports(Pets pet, long idDailyReport, LocalDateTime dateTime, String well, String reaction, byte[] pictureDailyReport, Boolean is_check) {
         this.pet = pet;
         this.idDailyReport = idDailyReport;
         this.dateTime = dateTime;
         this.well = well;
         this.reaction = reaction;
-        this.data = data;
+        this.pictureDailyReport = pictureDailyReport;
         this.is_check = is_check;
     }
 
     public DailyReports() {
-
     }
 
     public Pets getPet() {
@@ -88,12 +87,12 @@ public class DailyReports {
         this.reaction = reaction;
     }
 
-    public byte[] getData() {
-        return data;
+    public byte[] getPictureDailyReport() {
+        return pictureDailyReport;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
+    public void setPictureDailyReport(byte[] pictureDailyReport) {
+        this.pictureDailyReport = pictureDailyReport;
     }
 
     public Boolean getIs_check() {
@@ -109,12 +108,12 @@ public class DailyReports {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DailyReports that = (DailyReports) o;
-        return idDailyReport == that.idDailyReport && Objects.equals(pet, that.pet) && Objects.equals(dateTime, that.dateTime) && Objects.equals(well, that.well) && Objects.equals(reaction, that.reaction) && Objects.deepEquals(data, that.data) && Objects.equals(is_check, that.is_check);
+        return idDailyReport == that.idDailyReport && Objects.equals(pet, that.pet) && Objects.equals(dateTime, that.dateTime) && Objects.equals(well, that.well) && Objects.equals(reaction, that.reaction) && Objects.deepEquals(pictureDailyReport, that.pictureDailyReport) && Objects.equals(is_check, that.is_check);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pet, idDailyReport, dateTime, well, reaction, Arrays.hashCode(data), is_check);
+        return Objects.hash(pet, idDailyReport, dateTime, well, reaction, Arrays.hashCode(pictureDailyReport), is_check);
     }
 
     @Override
@@ -125,7 +124,7 @@ public class DailyReports {
                 ", dateTime=" + dateTime +
                 ", well='" + well + '\'' +
                 ", reaction='" + reaction + '\'' +
-                ", data=" + Arrays.toString(data) +
+                ", pictureDailyReport=" + Arrays.toString(pictureDailyReport) +
                 ", is_check=" + is_check +
                 '}';
     }

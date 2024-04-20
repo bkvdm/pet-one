@@ -5,24 +5,31 @@ import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
-@Entity(name = "shelter")
+@Entity(name = "shelters")
 public class Shelters {
     @OneToMany(mappedBy = "shelter")
     private List<Pets> pet;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_shelter")
     private long id;
+
     @Column(name = "name")
     private String name;
+
     @Column(name = "operation_mode")
     private String operationMode;
+
     @Column(name = "contact")
     private String contact;
+
     @Column(name = "address")
     private String address;
+
     @Column(name = "drilling_director")
     private String drillingDirector;
+
     @Column(name = "security_contact")
     private String security_contact;
 
@@ -38,7 +45,6 @@ public class Shelters {
     }
 
     public Shelters() {
-
     }
 
     public List<Pets> getPet() {

@@ -2,10 +2,13 @@ package tel.bvm.pet.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @Entity(name = "clients")
 public class Clients {
+    @OneToMany(mappedBy = "client")
+    private List<Pets> pet;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,11 +24,23 @@ public class Clients {
     @Column(name = "contact")
     private String contact;
 
-    public Clients(long id, long chatId, String name, String contact) {
+    public Clients(List<Pets> pet, long id, long chatId, String name, String contact) {
+        this.pet = pet;
         this.id = id;
         this.chatId = chatId;
         this.name = name;
         this.contact = contact;
+    }
+
+    public Clients() {
+    }
+
+    public List<Pets> getPet() {
+        return pet;
+    }
+
+    public void setPet(List<Pets> pet) {
+        this.pet = pet;
     }
 
     public long getId() {
@@ -65,18 +80,19 @@ public class Clients {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Clients clients = (Clients) o;
-        return id == clients.id && chatId == clients.chatId && Objects.equals(name, clients.name) && Objects.equals(contact, clients.contact);
+        return id == clients.id && chatId == clients.chatId && Objects.equals(pet, clients.pet) && Objects.equals(name, clients.name) && Objects.equals(contact, clients.contact);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chatId, name, contact);
+        return Objects.hash(pet, id, chatId, name, contact);
     }
 
     @Override
     public String toString() {
         return "Clients{" +
-                "id=" + id +
+                "pet=" + pet +
+                ", id=" + id +
                 ", chatId=" + chatId +
                 ", name='" + name + '\'' +
                 ", contact='" + contact + '\'' +

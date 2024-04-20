@@ -1,12 +1,12 @@
 --liquibase formatted sql
 --changeset bkvdm:1
-CREATE TABLE daily_report (
+CREATE TABLE daily_reports (
   id_daily_report BIGINT PRIMARY KEY AUTO_INCREMENT,
   id_pet BIGINT,
   date_time TIMESTAMP NOT NULL,
   well VARCHAR(255),
   reaction VARCHAR(255),
-  foto_pet BLOB,
+  picture_daily_report BLOB,
   is_check BOOLEAN NOT NULL,
   FOREIGN KEY (id_pet) REFERENCES Pets(id_pet)
 );
@@ -17,8 +17,9 @@ CREATE TABLE pets (
   type VARCHAR(255),
   busy_free BOOLEAN NOT NULL,
   date_take TIMESTAMP,
-  data_present LONGBLOB,
-  FOREIGN KEY (id_shelter) REFERENCES Shelters(id_shelter)
+  picture_pet LONGBLOB,
+  FOREIGN KEY (id_shelter) REFERENCES Shelters(id_shelter),
+  FOREIGN KEY (id_client) REFERENCES Clients(id_client)
 );
 CREATE TABLE clients (
   id_client BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -26,7 +27,7 @@ CREATE TABLE clients (
   name VARCHAR(255),
   contact VARCHAR(255)
 );
-CREATE TABLE shelter (
+CREATE TABLE shelters (
   id_shelter BIGINT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(255),
   operation_mode VARCHAR(255),
