@@ -2,17 +2,15 @@ package tel.bvm.pet.model;
 
 import jakarta.persistence.*;
 
-import java.util.List;
 import java.util.Objects;
 
-@Entity(name = "clients")
-public class Clients {
-    @OneToMany(mappedBy = "client")
-    private List<Pets> pet;
+@Entity
+@Table(name = "volunteers")
+public class Volunteer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_client")
+    @Column(name = "id_volunteer")
     private long id;
 
     @Column(name = "chat_id", nullable = false)
@@ -24,23 +22,14 @@ public class Clients {
     @Column(name = "contact")
     private String contact;
 
-    public Clients(List<Pets> pet, long id, long chatId, String name, String contact) {
-        this.pet = pet;
+    public Volunteer(long id, long chatId, String name, String contact) {
         this.id = id;
         this.chatId = chatId;
         this.name = name;
         this.contact = contact;
     }
 
-    public Clients() {
-    }
-
-    public List<Pets> getPet() {
-        return pet;
-    }
-
-    public void setPet(List<Pets> pet) {
-        this.pet = pet;
+    public Volunteer() {
     }
 
     public long getId() {
@@ -79,20 +68,19 @@ public class Clients {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Clients clients = (Clients) o;
-        return id == clients.id && chatId == clients.chatId && Objects.equals(pet, clients.pet) && Objects.equals(name, clients.name) && Objects.equals(contact, clients.contact);
+        Volunteer volunteer = (Volunteer) o;
+        return id == volunteer.id && chatId == volunteer.chatId && Objects.equals(name, volunteer.name) && Objects.equals(contact, volunteer.contact);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pet, id, chatId, name, contact);
+        return Objects.hash(id, chatId, name, contact);
     }
 
     @Override
     public String toString() {
-        return "Clients{" +
-                "pet=" + pet +
-                ", id=" + id +
+        return "Volunteer{" +
+                "id=" + id +
                 ", chatId=" + chatId +
                 ", name='" + name + '\'' +
                 ", contact='" + contact + '\'' +

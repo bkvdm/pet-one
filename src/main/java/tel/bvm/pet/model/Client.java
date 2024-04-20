@@ -5,12 +5,13 @@ import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
-@Entity(name = "volunteers")
-public class Volunteers {
+@Entity
+@Table(name = "clients")
+public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_volunteer")
+    @Column(name = "id_client")
     private long id;
 
     @Column(name = "chat_id", nullable = false)
@@ -22,14 +23,18 @@ public class Volunteers {
     @Column(name = "contact")
     private String contact;
 
-    public Volunteers(long id, long chatId, String name, String contact) {
+    @OneToMany(mappedBy = "client")
+    private List<Pet> pets;
+
+    public Client(long id, long chatId, String name, String contact, List<Pet> pets) {
         this.id = id;
         this.chatId = chatId;
         this.name = name;
         this.contact = contact;
+        this.pets = pets;
     }
 
-    public Volunteers() {
+    public Client() {
     }
 
     public long getId() {
@@ -64,26 +69,35 @@ public class Volunteers {
         this.contact = contact;
     }
 
+    public List<Pet> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Volunteers that = (Volunteers) o;
-        return id == that.id && chatId == that.chatId && Objects.equals(name, that.name) && Objects.equals(contact, that.contact);
+        Client client = (Client) o;
+        return id == client.id && chatId == client.chatId && Objects.equals(name, client.name) && Objects.equals(contact, client.contact) && Objects.equals(pets, client.pets);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chatId, name, contact);
+        return Objects.hash(id, chatId, name, contact, pets);
     }
 
     @Override
     public String toString() {
-        return "Volunteers{" +
+        return "Client{" +
                 "id=" + id +
                 ", chatId=" + chatId +
                 ", name='" + name + '\'' +
                 ", contact='" + contact + '\'' +
+                ", pets=" + pets +
                 '}';
     }
 }
