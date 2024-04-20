@@ -22,11 +22,9 @@ CREATE TABLE pets (
 );
 CREATE TABLE clients (
   id_client BIGINT PRIMARY KEY AUTO_INCREMENT,
-  id_volunteer BIGINT,
   chat_id BIGINT NOT NULL,
   name VARCHAR(255),
-  contact VARCHAR(255),
-  FOREIGN KEY (id_volunteer) REFERENCES Volunteers(id_volunteer)
+  contact VARCHAR(255)
 );
 CREATE TABLE shelter (
   id_shelter BIGINT PRIMARY KEY AUTO_INCREMENT,
