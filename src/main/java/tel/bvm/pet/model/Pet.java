@@ -30,7 +30,7 @@ public class Pet {
 
     //    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "id_view_pet")
+    @JoinColumn(name = "id_view_pet", nullable = false)
     private ViewPet viewPet;
 
     @Column(name = "name_pet")

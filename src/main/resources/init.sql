@@ -30,6 +30,7 @@ CREATE TABLE pets
     id_pet      BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_shelter  BIGINT,
     id_client   BIGINT,
+    id_view_pet BIGINT NOT NULL,
     name_pet    VARCHAR(255),
     busy_free   BOOLEAN NOT NULL,
     date_take   TIMESTAMP,
