@@ -2,16 +2,16 @@
 --changeset bkvdm:1
 CREATE TABLE clients
 (
-    id_client BIGINT AUTO_INCREMENT PRIMARY KEY,
-    chat_id   BIGINT NOT NULL,
-    name      VARCHAR(255),
-    contact   VARCHAR(255)
+    id_client   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    chat_id     BIGINT NOT NULL,
+    name_client VARCHAR(255),
+    contact     VARCHAR(255)
 );
 
 CREATE TABLE shelters
 (
     id_shelter        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name              VARCHAR(255),
+    name_shelter      VARCHAR(255),
     operation_mode    VARCHAR(255),
     contact           VARCHAR(255),
     address           VARCHAR(255),
@@ -19,18 +19,24 @@ CREATE TABLE shelters
     security_contact  VARCHAR(255)
 );
 
+CREATE TABLE view_pets
+(
+    id_view_pet   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name_view_pet VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE pets
 (
     id_pet      BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_shelter  BIGINT,
     id_client   BIGINT,
-    name        VARCHAR(255),
-    type        VARCHAR(255),
+    name_pet    VARCHAR(255),
     busy_free   BOOLEAN NOT NULL,
     date_take   TIMESTAMP,
     picture_pet LONGBLOB,
     FOREIGN KEY (id_shelter) REFERENCES shelters (id_shelter),
-    FOREIGN KEY (id_client) REFERENCES clients (id_client)
+    FOREIGN KEY (id_client) REFERENCES clients (id_client),
+    FOREIGN KEY (id_view_pet) REFERENCES view_pets (id_view_pet),
 );
 
 CREATE TABLE daily_reports
@@ -47,8 +53,8 @@ CREATE TABLE daily_reports
 
 CREATE TABLE volunteers
 (
-    id_volunteer BIGINT AUTO_INCREMENT PRIMARY KEY,
-    chat_id      BIGINT NOT NULL,
-    name         VARCHAR(255),
-    contact      VARCHAR(255)
+    id_volunteer   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    chat_id        BIGINT NOT NULL,
+    name_volunteer VARCHAR(255),
+    contact        VARCHAR(255)
 );

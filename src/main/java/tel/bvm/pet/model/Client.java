@@ -17,8 +17,8 @@ public class Client {
     @Column(name = "chat_id", nullable = false)
     private long chatId;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "name_client")
+    private String nameClient;
 
     @Column(name = "contact")
     private String contact;
@@ -26,10 +26,10 @@ public class Client {
     @OneToMany(mappedBy = "client")
     private List<Pet> pets;
 
-    public Client(long id, long chatId, String name, String contact, List<Pet> pets) {
+    public Client(long id, long chatId, String nameClient, String contact, List<Pet> pets) {
         this.id = id;
         this.chatId = chatId;
-        this.name = name;
+        this.nameClient = nameClient;
         this.contact = contact;
         this.pets = pets;
     }
@@ -53,12 +53,12 @@ public class Client {
         this.chatId = chatId;
     }
 
-    public String getName() {
-        return name;
+    public String getNameClient() {
+        return nameClient;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameClient(String nameClient) {
+        this.nameClient = nameClient;
     }
 
     public String getContact() {
@@ -82,12 +82,12 @@ public class Client {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Client client = (Client) o;
-        return id == client.id && chatId == client.chatId && Objects.equals(name, client.name) && Objects.equals(contact, client.contact) && Objects.equals(pets, client.pets);
+        return id == client.id && chatId == client.chatId && Objects.equals(nameClient, client.nameClient) && Objects.equals(contact, client.contact) && Objects.equals(pets, client.pets);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chatId, name, contact, pets);
+        return Objects.hash(id, chatId, nameClient, contact, pets);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class Client {
         return "Client{" +
                 "id=" + id +
                 ", chatId=" + chatId +
-                ", name='" + name + '\'' +
+                ", nameClient='" + nameClient + '\'' +
                 ", contact='" + contact + '\'' +
                 ", pets=" + pets +
                 '}';

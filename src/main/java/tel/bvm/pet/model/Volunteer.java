@@ -16,16 +16,16 @@ public class Volunteer {
     @Column(name = "chat_id", nullable = false)
     private long chatId;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "name_volunteer")
+    private String nameVolunteer;
 
     @Column(name = "contact")
     private String contact;
 
-    public Volunteer(long id, long chatId, String name, String contact) {
+    public Volunteer(long id, long chatId, String nameVolunteer, String contact) {
         this.id = id;
         this.chatId = chatId;
-        this.name = name;
+        this.nameVolunteer = nameVolunteer;
         this.contact = contact;
     }
 
@@ -48,12 +48,12 @@ public class Volunteer {
         this.chatId = chatId;
     }
 
-    public String getName() {
-        return name;
+    public String getNameVolunteer() {
+        return nameVolunteer;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameVolunteer(String nameVolunteer) {
+        this.nameVolunteer = nameVolunteer;
     }
 
     public String getContact() {
@@ -69,12 +69,12 @@ public class Volunteer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Volunteer volunteer = (Volunteer) o;
-        return id == volunteer.id && chatId == volunteer.chatId && Objects.equals(name, volunteer.name) && Objects.equals(contact, volunteer.contact);
+        return id == volunteer.id && chatId == volunteer.chatId && Objects.equals(nameVolunteer, volunteer.nameVolunteer) && Objects.equals(contact, volunteer.contact);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chatId, name, contact);
+        return Objects.hash(id, chatId, nameVolunteer, contact);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class Volunteer {
         return "Volunteer{" +
                 "id=" + id +
                 ", chatId=" + chatId +
-                ", name='" + name + '\'' +
+                ", nameVolunteer='" + nameVolunteer + '\'' +
                 ", contact='" + contact + '\'' +
                 '}';
     }
