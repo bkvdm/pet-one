@@ -35,8 +35,7 @@ public class Shelter {
     @OneToMany(mappedBy = "shelter")
     private List<Pet> pets;
 
-    public Shelter(long id, String nameShelter, String operationMode, String contact, String address, String drillingDirector, String security_contact, List<Pet> pets) {
-        this.id = id;
+    public Shelter(String nameShelter, String operationMode, String contact, String address, String drillingDirector, String security_contact, List<Pet> pets) {
         this.nameShelter = nameShelter;
         this.operationMode = operationMode;
         this.contact = contact;
@@ -47,6 +46,70 @@ public class Shelter {
     }
 
     public Shelter() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getNameShelter() {
+        return nameShelter;
+    }
+
+    public void setNameShelter(String nameShelter) {
+        this.nameShelter = nameShelter;
+    }
+
+    public String getOperationMode() {
+        return operationMode;
+    }
+
+    public void setOperationMode(String operationMode) {
+        this.operationMode = operationMode;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getDrillingDirector() {
+        return drillingDirector;
+    }
+
+    public void setDrillingDirector(String drillingDirector) {
+        this.drillingDirector = drillingDirector;
+    }
+
+    public String getSecurity_contact() {
+        return security_contact;
+    }
+
+    public void setSecurity_contact(String security_contact) {
+        this.security_contact = security_contact;
+    }
+
+    public List<Pet> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
     }
 
     @Override

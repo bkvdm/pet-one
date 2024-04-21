@@ -3,7 +3,6 @@ package tel.bvm.pet.model;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,8 +21,7 @@ public class ButtonMenu {
     @ManyToMany(mappedBy = "buttonMenus")
     private Set<ContentForm> menus = new HashSet<>();
 
-    public ButtonMenu(long id, byte menuNumber, Set<ContentForm> menus) {
-        this.id = id;
+    public ButtonMenu(byte menuNumber, Set<ContentForm> menus) {
         this.menuNumber = menuNumber;
         this.menus = menus;
     }

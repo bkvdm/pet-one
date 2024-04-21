@@ -18,19 +18,19 @@ public class Pet {
     @Column(name = "id_pet")
     private long id;
 
-    //    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "id_shelter")
+    @JoinColumn(name = "id_shelter", nullable = false)
+    @JsonIgnore
     private Shelter shelter;
 
-    //    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_client")
+    @JsonIgnore
     private Client client;
 
-    //    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_view_pet", nullable = false)
+    @JsonIgnore
     private ViewPet viewPet;
 
     @Column(name = "name_pet")
@@ -42,23 +42,22 @@ public class Pet {
     @Column(name = "date_take")
     private LocalDateTime dateTake;
 
-    @Lob
-    @Column(name = "picture_pet")
-    private byte[] picturePet;
-
     @OneToMany(mappedBy = "pet")
     private List<DailyReport> dailyReports;
 
-    public Pet(long id, Shelter shelter, Client client, ViewPet viewPet, String namePet, Boolean busyFree, LocalDateTime dateTake, byte[] picturePet, List<DailyReport> dailyReports) {
-        this.id = id;
+    @OneToOne(mappedBy = "pet")
+    @JsonIgnore
+    private PicturePet picturePet;
+
+    public Pet(Shelter shelter, Client client, ViewPet viewPet, String namePet, Boolean busyFree, LocalDateTime dateTake, List<DailyReport> dailyReports, PicturePet picturePet) {
         this.shelter = shelter;
         this.client = client;
         this.viewPet = viewPet;
         this.namePet = namePet;
         this.busyFree = busyFree;
         this.dateTake = dateTake;
-        this.picturePet = picturePet;
         this.dailyReports = dailyReports;
+        this.picturePet = picturePet;
     }
 
     public Pet() {
@@ -120,14 +119,6 @@ public class Pet {
         this.dateTake = dateTake;
     }
 
-    public byte[] getPicturePet() {
-        return picturePet;
-    }
-
-    public void setPicturePet(byte[] picturePet) {
-        this.picturePet = picturePet;
-    }
-
     public List<DailyReport> getDailyReports() {
         return dailyReports;
     }
@@ -136,17 +127,25 @@ public class Pet {
         this.dailyReports = dailyReports;
     }
 
+    public PicturePet getPicturePet() {
+        return picturePet;
+    }
+
+    public void setPicturePet(PicturePet picturePet) {
+        this.picturePet = picturePet;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pet pet = (Pet) o;
-        return id == pet.id && Objects.equals(shelter, pet.shelter) && Objects.equals(client, pet.client) && Objects.equals(viewPet, pet.viewPet) && Objects.equals(namePet, pet.namePet) && Objects.equals(busyFree, pet.busyFree) && Objects.equals(dateTake, pet.dateTake) && Objects.deepEquals(picturePet, pet.picturePet) && Objects.equals(dailyReports, pet.dailyReports);
+        return id == pet.id && Objects.equals(shelter, pet.shelter) && Objects.equals(client, pet.client) && Objects.equals(viewPet, pet.viewPet) && Objects.equals(namePet, pet.namePet) && Objects.equals(busyFree, pet.busyFree) && Objects.equals(dateTake, pet.dateTake) && Objects.equals(dailyReports, pet.dailyReports) && Objects.equals(picturePet, pet.picturePet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, shelter, client, viewPet, namePet, busyFree, dateTake, Arrays.hashCode(picturePet), dailyReports);
+        return Objects.hash(id, shelter, client, viewPet, namePet, busyFree, dateTake, dailyReports, picturePet);
     }
 
     @Override
@@ -159,8 +158,8 @@ public class Pet {
                 ", namePet='" + namePet + '\'' +
                 ", busyFree=" + busyFree +
                 ", dateTake=" + dateTake +
-                ", picturePet=" + Arrays.toString(picturePet) +
                 ", dailyReports=" + dailyReports +
+                ", picturePet=" + picturePet +
                 '}';
     }
 }

@@ -20,10 +20,9 @@ public class ViewPet {
     @OneToMany(mappedBy = "viewPet")
     private List<Pet> pets;
 
-    public ViewPet(long id, List<Pet> pets, String nameViewPet) {
-        this.id = id;
-        this.pets = pets;
+    public ViewPet(String nameViewPet, List<Pet> pets) {
         this.nameViewPet = nameViewPet;
+        this.pets = pets;
     }
 
     public ViewPet() {
@@ -37,14 +36,6 @@ public class ViewPet {
         this.id = id;
     }
 
-    public List<Pet> getPets() {
-        return pets;
-    }
-
-    public void setPets(List<Pet> pets) {
-        this.pets = pets;
-    }
-
     public String getNameViewPet() {
         return nameViewPet;
     }
@@ -53,25 +44,33 @@ public class ViewPet {
         this.nameViewPet = nameViewPet;
     }
 
+    public List<Pet> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ViewPet viewPet = (ViewPet) o;
-        return id == viewPet.id && Objects.equals(pets, viewPet.pets) && Objects.equals(nameViewPet, viewPet.nameViewPet);
+        return id == viewPet.id && Objects.equals(nameViewPet, viewPet.nameViewPet) && Objects.equals(pets, viewPet.pets);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, pets, nameViewPet);
+        return Objects.hash(id, nameViewPet, pets);
     }
 
     @Override
     public String toString() {
         return "ViewPet{" +
                 "id=" + id +
-                ", pets=" + pets +
                 ", nameViewPet='" + nameViewPet + '\'' +
+                ", pets=" + pets +
                 '}';
     }
 }

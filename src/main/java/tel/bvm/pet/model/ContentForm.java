@@ -34,8 +34,7 @@ public class ContentForm {
     )
     private Set<ButtonMenu> buttonMenus = new HashSet<>();
 
-    public ContentForm(long id, String nameContent, String content, Form form, Set<ButtonMenu> buttonMenus) {
-        this.id = id;
+    public ContentForm(String nameContent, String content, Form form, Set<ButtonMenu> buttonMenus) {
         this.nameContent = nameContent;
         this.content = content;
         this.form = form;
@@ -81,8 +80,8 @@ public class ContentForm {
         return buttonMenus;
     }
 
-    public void setButtonMenus(Set<ButtonMenu> buttons) {
-        this.buttonMenus = buttons;
+    public void setButtonMenus(Set<ButtonMenu> buttonMenus) {
+        this.buttonMenus = buttonMenus;
     }
 
     @Override
@@ -105,7 +104,7 @@ public class ContentForm {
                 ", nameContent='" + nameContent + '\'' +
                 ", content='" + content + '\'' +
                 ", form=" + form +
-                ", buttons=" + buttonMenus +
+                ", buttonMenus=" + buttonMenus +
                 '}';
     }
 }

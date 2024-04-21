@@ -26,8 +26,7 @@ public class Client {
     @OneToMany(mappedBy = "client")
     private List<Pet> pets;
 
-    public Client(long id, long chatId, String nameClient, String contact, List<Pet> pets) {
-        this.id = id;
+    public Client(long chatId, String nameClient, String contact, List<Pet> pets) {
         this.chatId = chatId;
         this.nameClient = nameClient;
         this.contact = contact;

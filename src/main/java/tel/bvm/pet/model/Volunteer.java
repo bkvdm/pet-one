@@ -22,8 +22,7 @@ public class Volunteer {
     @Column(name = "contact")
     private String contact;
 
-    public Volunteer(long id, long chatId, String nameVolunteer, String contact) {
-        this.id = id;
+    public Volunteer(long chatId, String nameVolunteer, String contact) {
         this.chatId = chatId;
         this.nameVolunteer = nameVolunteer;
         this.contact = contact;

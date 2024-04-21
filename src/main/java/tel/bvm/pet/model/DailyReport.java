@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
 @Table(name = "daily_reports")
 public class DailyReport {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_daily_report")
@@ -17,7 +17,7 @@ public class DailyReport {
 
     @ManyToOne
     @JoinColumn(name = "id_pet", nullable = false)
-//    @JsonIgnore
+    @JsonIgnore
     private Pet pet;
 
     @Column(name = "date_time", nullable = false)
@@ -29,21 +29,20 @@ public class DailyReport {
     @Column(name = "reaction")
     private String reaction;
 
-    @Lob
-    @Column(name = "picture_daily_report")
-    private byte[] pictureDailyReport;
-
     @Column(name = "is_check", nullable = false)
     private Boolean isCheck;
 
-    public DailyReport(long idDailyReport, Pet pet, LocalDateTime dateTime, String well, String reaction, byte[] pictureDailyReport, Boolean isCheck) {
-        this.idDailyReport = idDailyReport;
+    @OneToOne(mappedBy = "dailyReport")
+    @JsonIgnore
+    private PictureDailyReport pictureDailyReport;
+
+    public DailyReport(Pet pet, LocalDateTime dateTime, String well, String reaction, Boolean isCheck, PictureDailyReport pictureDailyReport) {
         this.pet = pet;
         this.dateTime = dateTime;
         this.well = well;
         this.reaction = reaction;
-        this.pictureDailyReport = pictureDailyReport;
         this.isCheck = isCheck;
+        this.pictureDailyReport = pictureDailyReport;
     }
 
     public DailyReport() {
@@ -89,14 +88,6 @@ public class DailyReport {
         this.reaction = reaction;
     }
 
-    public byte[] getPictureDailyReport() {
-        return pictureDailyReport;
-    }
-
-    public void setPictureDailyReport(byte[] pictureDailyReport) {
-        this.pictureDailyReport = pictureDailyReport;
-    }
-
     public Boolean getCheck() {
         return isCheck;
     }
@@ -105,17 +96,25 @@ public class DailyReport {
         isCheck = check;
     }
 
+    public PictureDailyReport getPictureDailyReport() {
+        return pictureDailyReport;
+    }
+
+    public void setPictureDailyReport(PictureDailyReport pictureDailyReport) {
+        this.pictureDailyReport = pictureDailyReport;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DailyReport that = (DailyReport) o;
-        return idDailyReport == that.idDailyReport && Objects.equals(pet, that.pet) && Objects.equals(dateTime, that.dateTime) && Objects.equals(well, that.well) && Objects.equals(reaction, that.reaction) && Objects.deepEquals(pictureDailyReport, that.pictureDailyReport) && Objects.equals(isCheck, that.isCheck);
+        return idDailyReport == that.idDailyReport && Objects.equals(pet, that.pet) && Objects.equals(dateTime, that.dateTime) && Objects.equals(well, that.well) && Objects.equals(reaction, that.reaction) && Objects.equals(isCheck, that.isCheck) && Objects.equals(pictureDailyReport, that.pictureDailyReport);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idDailyReport, pet, dateTime, well, reaction, Arrays.hashCode(pictureDailyReport), isCheck);
+        return Objects.hash(idDailyReport, pet, dateTime, well, reaction, isCheck, pictureDailyReport);
     }
 
     @Override
@@ -126,8 +125,8 @@ public class DailyReport {
                 ", dateTime=" + dateTime +
                 ", well='" + well + '\'' +
                 ", reaction='" + reaction + '\'' +
-                ", pictureDailyReport=" + Arrays.toString(pictureDailyReport) +
                 ", isCheck=" + isCheck +
+                ", pictureDailyReport=" + pictureDailyReport +
                 '}';
     }
 }
