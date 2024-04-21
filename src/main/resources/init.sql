@@ -60,6 +60,28 @@ CREATE TABLE volunteers
     contact        VARCHAR(255)
 );
 
+CREATE TABLE button_menus
+(
+    id_button_menu BIGINT AUTO_INCREMENT PRIMARY KEY,
+    menu_number    TINYINT NOT NULL
+);
+
+CREATE TABLE content_forms
+(
+    id_content   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name_content VARCHAR(255) NOT NULL,
+    content      TEXT         NOT NULL
+);
+
+CREATE TABLE content_menu
+(
+    id_content     BIGINT NOT NULL,
+    id_button_menu BIGINT NOT NULL,
+    PRIMARY KEY (id_content, id_button_menu),
+    FOREIGN KEY (id_content) REFERENCES content_forms (id_content),
+    FOREIGN KEY (id_button_menu) REFERENCES button_menus (id_button_menu)
+);
+
 CREATE TABLE forms
 (
     id_form         BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -70,10 +92,4 @@ CREATE TABLE forms
     content_form_id BIGINT,
     UNIQUE (content_form_id),
     FOREIGN KEY (content_form_id) REFERENCES content_forms (id_content)
-);
-
-CREATE TABLE content_forms
-(
-    id_content BIGINT AUTO_INCREMENT PRIMARY KEY,
-    content    TEXT NOT NULL
 );
