@@ -29,19 +29,6 @@ public class DefaultDataViewPet {
         throw new IllegalArgumentException("Unsupported view pet type: " + nameViewPet);
     }
 
-//            if (nameViewPet.toString().equals("CAT")) {
-//        ViewPet viewPet = new ViewPet(ViewPet.NameViewPet.CAT, null);
-//        viewPet.setId(1);
-//        return viewPet;
-//    } else if (nameViewPet.toString().equals("DOG")) {
-//        ViewPet viewPet = new ViewPet(ViewPet.NameViewPet.DOG, null);
-//        viewPet.setId(2);
-//        return viewPet;
-//    }
-//        throw new IllegalArgumentException("Unsupported view pet type: " + nameViewPet);
-
-
-
     Map<ViewPet.NameViewPet, ViewPet> viewPetMap = new HashMap<ViewPet.NameViewPet, ViewPet>(Map.of(
             createViewPet(ViewPet.NameViewPet.CAT).getNameViewPet(), createViewPet(ViewPet.NameViewPet.CAT),
             createViewPet(ViewPet.NameViewPet.DOG).getNameViewPet(), createViewPet(ViewPet.NameViewPet.DOG)));
