@@ -83,7 +83,8 @@ CREATE TABLE volunteers
 CREATE TABLE button_menus
 (
     id_button_menu BIGINT AUTO_INCREMENT PRIMARY KEY,
-    menu_number    TINYINT NOT NULL
+    menu_name VARCHAR(255) NOT NULL,
+    menu_number TINYINT NOT NULL
 );
 
 CREATE TABLE content_forms

@@ -15,13 +15,36 @@ public class ButtonMenu {
     @Column(name = "id_button_menu")
     private long id;
 
+    public enum NameButtonMenu {
+        REGISTRATION_PRODUCE("Процедура регистрации"),
+        GUEST_MENU("Гость"),
+        CLIENT_REGISTERED_WITH_PETS("Клиент зарегистрирован, питомцы на испытании"),
+        CLIENT_REGISTERED_NO_PETS("Клиент зарегистрирован, без питомцев"),
+        ADOPTION_INFO("Информация для усыновления");
+
+        private String displayName;
+
+        NameButtonMenu(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "menu_name", nullable = false)
+    private NameButtonMenu nameButtonMenu;
+
     @Column(name = "menu_number")
     private byte menuNumber;
 
     @ManyToMany(mappedBy = "buttonMenus")
     private Set<ContentForm> menus = new HashSet<>();
 
-    public ButtonMenu(byte menuNumber, Set<ContentForm> menus) {
+    public ButtonMenu(NameButtonMenu nameButtonMenu, byte menuNumber, Set<ContentForm> menus) {
+        this.nameButtonMenu = nameButtonMenu;
         this.menuNumber = menuNumber;
         this.menus = menus;
     }
@@ -29,12 +52,12 @@ public class ButtonMenu {
     public ButtonMenu() {
     }
 
-    public long getId() {
-        return id;
+    public NameButtonMenu getNameButtonMenu() {
+        return nameButtonMenu;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setNameButtonMenu(NameButtonMenu nameButtonMenu) {
+        this.nameButtonMenu = nameButtonMenu;
     }
 
     public byte getMenuNumber() {
@@ -58,18 +81,19 @@ public class ButtonMenu {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ButtonMenu that = (ButtonMenu) o;
-        return id == that.id && menuNumber == that.menuNumber && Objects.equals(menus, that.menus);
+        return id == that.id && menuNumber == that.menuNumber && nameButtonMenu == that.nameButtonMenu && Objects.equals(menus, that.menus);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuNumber, menus);
+        return Objects.hash(id, nameButtonMenu, menuNumber, menus);
     }
 
     @Override
     public String toString() {
         return "ButtonMenu{" +
                 "id=" + id +
+                ", nameButtonMenu=" + nameButtonMenu +
                 ", menuNumber=" + menuNumber +
                 ", menus=" + menus +
                 '}';

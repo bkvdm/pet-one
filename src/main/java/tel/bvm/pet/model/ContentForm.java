@@ -16,8 +16,67 @@ public class ContentForm {
     @Column(name = "id_content")
     private long id;
 
-    @Column(name = "name_content")
-    private String nameContent;
+    public enum NameContentForm {
+
+        // Контент текстом по кнопке. Название кнопки вызова контента.
+        RULE("Знакомство с питомцем"),
+        DOCUMENT("Документы"),
+        TRANSPORTATION("Транспортировка питомца"),
+        HOME_DOG("Дом для взрослой собаки"),
+        HOME_PUPPY("Дом для щенка"),
+        HOME_CAT("Дом для взрослой кошки"),
+        HOME_KITTEN("Дом для котёнка"),
+        CYNOLOG_VERIFY("Сертифицированные кинологи"),
+        REFUSAL("Условия отказа"),
+        ADVICE_CYNOLOG("Советы кинолога"),
+        RETURN_INSTRUCTION("Возврат питомца в приют"),
+        KEEPING_PET_DISABLE("Питомец с ограниченными возможностями"),
+        SHELTER_TERRITORY_RULE("Правила на территории приюта"),
+
+        // Кнопки перехода.
+        RETURN_PREVIOUS_MENU("Назад"),
+        RETURN_START_MENU("Возврат в начало"),
+
+        // Кнопки обращения к базе данных.
+        CALLING_VOLUNTEER("Помощь волонтёра"),
+        SING_UP("Регистрация клиента"),
+        SHELTERS_INFO("Информация о приютах"),
+        PET_ALL_INFO("Питомцы для усыновления"),
+        PET_CAT_INFO("Кошки для усыновления"),
+        PET_DOG_INFO("Собаки для усыновления"),
+        SEND_DAILY_REPORT("Отправить ежедневный отчёт"),
+
+        // Контент, как дополнение к команде. Содержание контента.
+        WELCOME_MESSAGE("Приветствие для гостя"),
+        GREETING_REGISTRATION_CLIENT("Приветствие для зарегистрированного клиента"),
+        GREETING_NEW_CLIENT("Приветствие для незарегистрированного клиента"),
+        DAILY_REPORT_NOT_CORRECT("Ежедневный отчёт не принят и требует доработки"),
+        DAILY_REPORT_CORRECT("Ежедневный отчёт принят"),
+        EXTENSION_TERM("Продление испытательного срока на количество дней"),
+        REMINDER_DAILY_REPORT("Напоминание о ежедневном отчёте по уходу за питомцем"),
+        REGISTRATION_INFO("Информация для регистрации клиента"),
+        CONGRATULATION_ADOPTION("Поздравление с усыновлением питомца");
+
+        private String displayName;
+
+        NameContentForm(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name_content", nullable = false)
+    private NameContentForm nameContent;
+
+//    @Column(name = "name_content")
+//    private String nameContent;
+
+//    @Column(name = "name_content")
+//    private String nameContent;
 
     @Column(name = "content")
     private String content;
@@ -34,7 +93,7 @@ public class ContentForm {
     )
     private Set<ButtonMenu> buttonMenus = new HashSet<>();
 
-    public ContentForm(String nameContent, String content, Form form, Set<ButtonMenu> buttonMenus) {
+    public ContentForm(NameContentForm nameContent, String content, Form form, Set<ButtonMenu> buttonMenus) {
         this.nameContent = nameContent;
         this.content = content;
         this.form = form;
@@ -52,11 +111,11 @@ public class ContentForm {
         this.id = id;
     }
 
-    public String getNameContent() {
+    public NameContentForm getNameContent() {
         return nameContent;
     }
 
-    public void setNameContent(String nameContent) {
+    public void setNameContent(NameContentForm nameContent) {
         this.nameContent = nameContent;
     }
 
