@@ -16,11 +16,15 @@ public class ButtonMenu {
     private long id;
 
     public enum NameButtonMenu {
-        REGISTRATION_PRODUCE("Процедура регистрации"),
         GUEST_MENU("Гость"),
-        CLIENT_REGISTERED_WITH_PETS("Клиент зарегистрирован, питомцы на испытании"),
+        REGISTRATION_PRODUCE("Процедура регистрации"),
         CLIENT_REGISTERED_NO_PETS("Клиент зарегистрирован, без питомцев"),
-        ADOPTION_INFO("Информация для усыновления");
+        CLIENT_REGISTERED_WITH_PETS("Клиент зарегистрирован, питомцы на испытании"),
+        ADOPTION_INFO("Информация для усыновления"),
+        END_REPORT_CYCLE("Меню окончания цикла сдачи отчёта"),
+        START_MENU("Начало"),
+        END_SUCCESSFUL_REGISTRATION("Успешная регистрация клиента"),
+        END_UNSUCCESSFUL_REGISTRATION("Неуспешная регистрация клиента");
 
         private String displayName;
 
@@ -34,22 +38,31 @@ public class ButtonMenu {
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "menu_name", nullable = false)
+//    @Column(name = "menu_name", nullable = false)
+    @Column(name = "menu_name")
     private NameButtonMenu nameButtonMenu;
 
-    @Column(name = "menu_number")
-    private byte menuNumber;
+    @Column(name = "menu_header")
+    private String menuHeader;
 
     @ManyToMany(mappedBy = "buttonMenus")
-    private Set<ContentForm> menus = new HashSet<>();
+    private Set<ContentForm> contentForm = new HashSet<>();
 
-    public ButtonMenu(NameButtonMenu nameButtonMenu, byte menuNumber, Set<ContentForm> menus) {
+    public ButtonMenu(NameButtonMenu nameButtonMenu, String menuHeader, Set<ContentForm> contentForm) {
         this.nameButtonMenu = nameButtonMenu;
-        this.menuNumber = menuNumber;
-        this.menus = menus;
+        this.menuHeader = menuHeader;
+        this.contentForm = contentForm;
     }
 
     public ButtonMenu() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public NameButtonMenu getNameButtonMenu() {
@@ -60,20 +73,20 @@ public class ButtonMenu {
         this.nameButtonMenu = nameButtonMenu;
     }
 
-    public byte getMenuNumber() {
-        return menuNumber;
+    public String getMenuHeader() {
+        return menuHeader;
     }
 
-    public void setMenuNumber(byte menuNumber) {
-        this.menuNumber = menuNumber;
+    public void setMenuHeader(String menuHeader) {
+        this.menuHeader = menuHeader;
     }
 
-    public Set<ContentForm> getMenus() {
-        return menus;
+    public Set<ContentForm> getContentForm() {
+        return contentForm;
     }
 
-    public void setMenus(Set<ContentForm> menus) {
-        this.menus = menus;
+    public void setContentForm(Set<ContentForm> contentForm) {
+        this.contentForm = contentForm;
     }
 
     @Override
@@ -81,12 +94,12 @@ public class ButtonMenu {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ButtonMenu that = (ButtonMenu) o;
-        return id == that.id && menuNumber == that.menuNumber && nameButtonMenu == that.nameButtonMenu && Objects.equals(menus, that.menus);
+        return id == that.id && nameButtonMenu == that.nameButtonMenu && Objects.equals(menuHeader, that.menuHeader) && Objects.equals(contentForm, that.contentForm);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nameButtonMenu, menuNumber, menus);
+        return Objects.hash(id, nameButtonMenu, menuHeader, contentForm);
     }
 
     @Override
@@ -94,8 +107,8 @@ public class ButtonMenu {
         return "ButtonMenu{" +
                 "id=" + id +
                 ", nameButtonMenu=" + nameButtonMenu +
-                ", menuNumber=" + menuNumber +
-                ", menus=" + menus +
+                ", menuHeader='" + menuHeader + '\'' +
+                ", contentForm=" + contentForm +
                 '}';
     }
 }

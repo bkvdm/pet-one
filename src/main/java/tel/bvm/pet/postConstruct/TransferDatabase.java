@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import java.sql.SQLException;
 
 import jakarta.annotation.PostConstruct;
-import tel.bvm.pet.model.Pet;
-import tel.bvm.pet.model.Shelter;
-import tel.bvm.pet.model.ViewPet;
+import tel.bvm.pet.model.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -19,24 +17,74 @@ import java.sql.Timestamp;
 @Component
 public class TransferDatabase {
 
+    private final DataButtonMenu dataButtonMenu;
+    private final DataContentForm dataContentForm;
     private final DefaultDataPet defaultDataPet;
     private final DefaultDataShelter defaultDataShelter;
-
-    private final DataSource dataSource;
     private final DefaultDataViewPet defaultDataViewPet;
 
-    public TransferDatabase(DefaultDataPet defaultDataPet, DefaultDataShelter defaultDataShelter, DataSource dataSource, DefaultDataViewPet defaultDataViewPet) {
+    private final DataSource dataSource;
+
+    public TransferDatabase(DataButtonMenu dataButtonMenu, DataContentForm dataContentForm, DefaultDataPet defaultDataPet, DefaultDataShelter defaultDataShelter, DataSource dataSource, DefaultDataViewPet defaultDataViewPet) {
+        this.dataButtonMenu = dataButtonMenu;
+        this.dataContentForm = dataContentForm;
         this.defaultDataPet = defaultDataPet;
         this.defaultDataShelter = defaultDataShelter;
-        this.dataSource = dataSource;
         this.defaultDataViewPet = defaultDataViewPet;
+        this.dataSource = dataSource;
     }
 
     @PostConstruct
     void init() throws SQLException {
+        insertDataButtonMenu();
+        insertDataContentForm();
         insertDataShelter();
         insertDataViewPet();
         insertDataPet();
+    }
+
+    void insertDataButtonMenu() throws SQLException {
+        final Connection connection = dataSource.getConnection();
+        // Map<ButtonMenu.NameButtonMenu, ButtonMenu> buttonMenuMap = new HashMap<>();
+        try (PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO button_menus(menu_name, menu_header) VALUES(?, ?)")) {
+            for (Map.Entry<ButtonMenu.NameButtonMenu, ButtonMenu> entry : dataButtonMenu.buttonMenuMap.entrySet()) {
+                ButtonMenu buttonMenu = entry.getValue();
+                ButtonMenu.NameButtonMenu nameButtonMenu = buttonMenu.getNameButtonMenu();
+                String menuHeader = buttonMenu.getMenuHeader();
+
+                statement.setString(1, nameButtonMenu.toString());
+                statement.setString(2, menuHeader);
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connection.close();
+        }
+    }
+
+    void insertDataContentForm() throws SQLException {
+        final Connection connection = dataSource.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO content_forms VALUES (?, ?, ?)")) {
+            for (Map.Entry<ContentForm.NameContentForm, ContentForm> entry : dataContentForm.contentFormMap.entrySet()) {
+                ContentForm contentForm = entry.getValue();
+                long ;
+                ContentForm.NameContentForm nameContentForm = contentForm.getNameContent();
+                String content = contentForm.getContent();
+
+                statement.setString(1, nameContentForm.toString());
+                statement.setString(2, content);
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connection.close();
+        }
     }
 
     void insertDataShelter() throws SQLException {
