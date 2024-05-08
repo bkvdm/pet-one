@@ -80,23 +80,22 @@ CREATE TABLE volunteers
     contact        VARCHAR(255)
 );
 
-CREATE TABLE button_menus
-(
-    id_button_menu BIGINT AUTO_INCREMENT PRIMARY KEY,
---     menu_name      VARCHAR(255) NOT NULL,
-    menu_name      VARCHAR(255),
---     menu_header    MEDIUMTEXT   NOT NULL
-    menu_header    TEXT
-);
-
 CREATE TABLE content_forms
 (
-    id_content   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_content   BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    id_content   BIGINT PRIMARY KEY,
 --     name_content VARCHAR(255) NOT NULL,
-    name_content VARCHAR(255),
---     content      MEDIUMTEXT   NOT NULL
---     content      MEDIUMTEXT
+    name_content TEXT NOT NULL,
     content      TEXT
+);
+
+CREATE TABLE button_menus
+(
+    id_button_menu BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    id_button_menu BIGINT PRIMARY KEY,
+--     menu_name      VARCHAR(255) NOT NULL,
+    menu_name      TEXT NOT NULL,
+    menu_header    TEXT
 );
 
 CREATE TABLE content_menu

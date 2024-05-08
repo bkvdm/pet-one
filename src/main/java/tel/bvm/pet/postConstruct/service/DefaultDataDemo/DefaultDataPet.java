@@ -1,4 +1,4 @@
-package tel.bvm.pet.postConstruct;
+package tel.bvm.pet.postConstruct.service.DefaultDataDemo;
 
 import org.springframework.stereotype.Component;
 import tel.bvm.pet.model.Pet;
@@ -31,7 +31,7 @@ public class DefaultDataPet {
     Pet petDogFive = new Pet(defaultDataShelter.shelterInfo("ЗооДом"), null, defaultDataViewPet.viewPetInfo(ViewPet.NameViewPet.DOG), "Джесси", true, LocalDateTime.of(2023, 7, 17, 0, 0), null, null);
     Pet petDogSix = new Pet(defaultDataShelter.shelterInfo("ЗооДом"), null, defaultDataViewPet.viewPetInfo(ViewPet.NameViewPet.DOG), "Тайсон", true, LocalDateTime.of(2023, 8, 27, 0, 0), null, null);
 
-    List<Pet> petList = new ArrayList<>(Arrays.asList
+    public List<Pet> petList = new ArrayList<>(Arrays.asList
             (petCatOne, petCatTwo, petCatThree, petCatFour, petCatFive, petCatSix,
                     petDogOne, petDogTwo, petDogThree, petDogFour, petDogFive, petDogSix));
 

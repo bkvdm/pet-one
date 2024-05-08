@@ -1,4 +1,4 @@
-package tel.bvm.pet.postConstruct;
+package tel.bvm.pet.postConstruct.service.DefaultDataDemo;
 
 import org.springframework.stereotype.Component;
 import tel.bvm.pet.model.Shelter;
@@ -36,7 +36,7 @@ public class DefaultDataShelter {
         throw new IllegalArgumentException("Unsupported shelter: " + nameShelter);
     }
 
-    Map<String, Shelter> shelterMap = new HashMap<String, Shelter>(Map.of(
+    public Map<String, Shelter> shelterMap = new HashMap<String, Shelter>(Map.of(
             createShelter("Приют Друзей").getNameShelter(), createShelter("Приют Друзей"),
             createShelter("Питомец").getNameShelter(), createShelter("Питомец"),
             createShelter("Убежище лап").getNameShelter(), createShelter("Убежище лап"),

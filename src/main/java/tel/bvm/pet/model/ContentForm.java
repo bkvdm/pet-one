@@ -32,46 +32,40 @@ public class ContentForm {
         RETURN_INSTRUCTION("Возврат питомца в приют"),
         KEEPING_PET_DISABLE("Питомец с ограниченными возможностями"),
         SHELTER_TERRITORY_RULE("Правила на территории приюта"),
-//        SUCCESSFUL_REGISTRATION("Успешная регистрация клиента"),
-//        UNSUCCESSFUL_REGISTRATION("Неуспешная регистрация клиента"),
-
-        // Successful registration
 
         // Кнопки перехода.
         RETURN_PREVIOUS_MENU("Назад"),
         RETURN_START_MENU("Завершить и вернуть в начало"),
         SING_UP_MENU("Перейти к регистрации"),
         CONTINUE_NEXT_MENU("Продолжить в следующем меню"),
+        ADOPTION_INFO_MENU("Меню информации об усыновлении"),
 
-        // Кнопки обращения к базе данных.
+        // Кнопки обращения к базе данных, в том числе:
+
+        // кнопки получения данных:
         CALLING_VOLUNTEER("Помощь волонтёра"),
-        SING_UP("Регистрация клиента"),
         SHELTERS_INFO("Информация о приютах"),
         PET_ALL_INFO("Питомцы для усыновления"),
         PET_CAT_INFO("Кошки для усыновления"),
         PET_DOG_INFO("Собаки для усыновления"),
-        SEND_DAILY_REPORT("Отправить ежедневный отчёт"),
         START("Начать"),
 
-        // Контент, как дополнение к команде. Дополнение к меню при вызове. Содержание контента.
-//        WELCOME_MESSAGE("Приветствие для гостя"),
-//        GREETING_REGISTRATION_CLIENT("Приветствие для зарегистрированного клиента"),
-//        GREETING_NEW_CLIENT("Приветствие для незарегистрированного клиента"),
+        // кнопки передачи данных:
+        SING_UP("Регистрация клиента"),
+        SEND_DAILY_REPORT("Отправить ежедневный отчёт"),
+
+        // Контент, как дополнение к команде. Дополнение к меню при вызове. Содержание команды.
         DAILY_REPORT_NOT_CORRECT("Ежедневный отчёт не принят и требует доработки"),
         DAILY_REPORT_CORRECT("Ежедневный отчёт принят"),
         EXTENSION_TERM("Продление испытательного срока на дней: "),
         REMINDER_DAILY_REPORT("Напоминание о ежедневном отчёте по уходу за питомцем"),
-//        REGISTRATION_INFO("Информация для регистрации клиента"),
         CONGRATULATION_ADOPTION("Поздравление с усыновлением питомца"),
 
-        // Команды по циклу процесса передачи клиентом данных в рамках ежедневного отчёта
+        // Команды по циклу приёма данных для ежедневного отчёте
         PICTURE_DAILY_REPORT("Фото питомца для отчёта"),
         RATION_DAILY_REPORT("Рацион питомца для отчёта"),
         HEALTH_DAILY_REPORT("Самочувствие питомца для отчёта"),
         CHANGE_DAILY_REPORT("Поведение питомца для отчёта");
-
-        //
-
 
         private String displayName;
 
@@ -85,15 +79,8 @@ public class ContentForm {
     }
 
     @Enumerated(EnumType.STRING)
-//    @Column(name = "name_content", nullable = false)
-    @Column(name = "name_content")
+    @Column(name = "name_content", nullable = false)
     private NameContentForm nameContent;
-
-//    @Column(name = "name_content")
-//    private String nameContent;
-
-//    @Column(name = "name_content")
-//    private String nameContent;
 
     @Column(name = "content")
     private String content;
@@ -102,7 +89,7 @@ public class ContentForm {
     @JsonIgnore
     private Form form;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "content_menu",
             joinColumns = @JoinColumn(name = "id_content"),
@@ -116,6 +103,13 @@ public class ContentForm {
         this.content = content;
         this.form = form;
         this.buttonMenus = buttonMenus;
+    }
+
+    public ContentForm(ContentForm other) {
+        this.nameContent = other.nameContent;
+        this.content = other.content;
+        this.form = other.form;
+        this.buttonMenus = (other.buttonMenus != null) ? new HashSet<>(other.buttonMenus) : null;
     }
 
     public ContentForm() {

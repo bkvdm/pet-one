@@ -1,11 +1,14 @@
 package tel.bvm.pet.postConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 
 import jakarta.annotation.PostConstruct;
 import tel.bvm.pet.model.*;
+import tel.bvm.pet.postConstruct.service.DataContentMenuService;
+import tel.bvm.pet.postConstruct.service.DefaultDataDemo.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -13,81 +16,169 @@ import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.sql.Timestamp;
+import java.util.Set;
+
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class TransferDatabase {
 
-    private final DataButtonMenu dataButtonMenu;
-    private final DataContentForm dataContentForm;
+    private final DataContentMenuService dataContentMenuService;
     private final DefaultDataPet defaultDataPet;
     private final DefaultDataShelter defaultDataShelter;
     private final DefaultDataViewPet defaultDataViewPet;
-
     private final DataSource dataSource;
+    private final DefaultDataVolunteer defaultDataVolunteer;
+    private final DefaultDataClient defaultDataClient;
 
-    public TransferDatabase(DataButtonMenu dataButtonMenu, DataContentForm dataContentForm, DefaultDataPet defaultDataPet, DefaultDataShelter defaultDataShelter, DataSource dataSource, DefaultDataViewPet defaultDataViewPet) {
-        this.dataButtonMenu = dataButtonMenu;
-        this.dataContentForm = dataContentForm;
+    @Autowired
+    public TransferDatabase(DataContentMenuService dataContentMenuService, DefaultDataVolunteer defaultDataVolunteer, DefaultDataClient defaultDataClient, DefaultDataPet defaultDataPet, DefaultDataShelter defaultDataShelter, DataSource dataSource, DefaultDataViewPet defaultDataViewPet) {
+
+        this.dataContentMenuService = dataContentMenuService;
         this.defaultDataPet = defaultDataPet;
         this.defaultDataShelter = defaultDataShelter;
         this.defaultDataViewPet = defaultDataViewPet;
         this.dataSource = dataSource;
+        this.defaultDataVolunteer = defaultDataVolunteer;
+        this.defaultDataClient = defaultDataClient;
     }
 
     @PostConstruct
     void init() throws SQLException {
-        insertDataButtonMenu();
-        insertDataContentForm();
-        insertDataShelter();
-        insertDataViewPet();
-        insertDataPet();
+
+        // Методы закомментированы после отработки и загрузки данных в базу данных
+//
+//        setupDataVolunteer();
+//        setupDataClient();
+//        setupMenu();
+//        setupContent();
+//        linkButtonMenuAndContentForm();
+//        insertDataShelter();
+//        insertDataViewPet();
+//        insertDataPet();
     }
 
-    void insertDataButtonMenu() throws SQLException {
-        final Connection connection = dataSource.getConnection();
-        // Map<ButtonMenu.NameButtonMenu, ButtonMenu> buttonMenuMap = new HashMap<>();
-        try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO button_menus(menu_name, menu_header) VALUES(?, ?)")) {
-            for (Map.Entry<ButtonMenu.NameButtonMenu, ButtonMenu> entry : dataButtonMenu.buttonMenuMap.entrySet()) {
-                ButtonMenu buttonMenu = entry.getValue();
-                ButtonMenu.NameButtonMenu nameButtonMenu = buttonMenu.getNameButtonMenu();
-                String menuHeader = buttonMenu.getMenuHeader();
+    void setupDataVolunteer() throws SQLException {
 
-                statement.setString(1, nameButtonMenu.toString());
-                statement.setString(2, menuHeader);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "INSERT INTO volunteers(chat_id, name_volunteer, contact) VALUES(?, ?, ?)")) {
+
+            for (Volunteer volunteer : defaultDataVolunteer.volunteers) {
+                long chatId = volunteer.getChatId();
+                String name = volunteer.getNameVolunteer();
+                String contact = volunteer.getContact();
+                statement.setLong(1, chatId);
+                statement.setString(2, name);
+                statement.setString(3, contact);
                 statement.addBatch();
             }
             statement.executeBatch();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            connection.close();
+            throw new SQLException(e);
         }
     }
 
-    void insertDataContentForm() throws SQLException {
-        final Connection connection = dataSource.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO content_forms VALUES (?, ?, ?)")) {
-            for (Map.Entry<ContentForm.NameContentForm, ContentForm> entry : dataContentForm.contentFormMap.entrySet()) {
-                ContentForm contentForm = entry.getValue();
-                long ;
-                ContentForm.NameContentForm nameContentForm = contentForm.getNameContent();
-                String content = contentForm.getContent();
+    void setupDataClient() throws SQLException {
 
-                statement.setString(1, nameContentForm.toString());
-                statement.setString(2, content);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "INSERT INTO clients(chat_id, name_client, contact) VALUES(?, ?, ?)")) {
+
+            for (Client client : defaultDataClient.clients) {
+                long chatId = client.getChatId();
+                String nameClient = client.getNameClient();
+                String contact = client.getContact();
+                statement.setLong(1, chatId);
+                statement.setString(2, nameClient);
+                statement.setString(3, contact);
                 statement.addBatch();
             }
             statement.executeBatch();
-        } catch (RuntimeException e) {
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    void setupMenu() throws SQLException {
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "INSERT INTO button_menus(id_button_menu, menu_name, menu_header) VALUES(?, ?, ?)")) {
+
+            for (Object entry : dataContentMenuService.contentMenuSet()) {
+                if (entry instanceof ButtonMenu) {
+
+                    ButtonMenu buttonMenu = (ButtonMenu) entry;
+
+                    long idButtonMenu = buttonMenu.getId();
+                    ButtonMenu.NameButtonMenu nameButtonMenu = buttonMenu.getNameButtonMenu();
+                    String menuHeader = buttonMenu.getMenuHeader();
+                    statement.setLong(1, idButtonMenu);
+                    statement.setString(2, nameButtonMenu.toString());
+                    statement.setString(3, menuHeader);
+                    statement.addBatch();
+                }
+
+                statement.executeBatch();
+            }
+        } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            connection.close();
+        }
+    }
+
+    void setupContent() throws SQLException {
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "INSERT INTO content_forms(id_content, name_content, content) VALUES (?, ?, ?)")) {
+
+            for (Object entry : dataContentMenuService.contentMenuSet()) {
+                if (entry instanceof ContentForm) {
+
+                    ContentForm contentForm = (ContentForm) entry;
+
+                    long idContentForm = contentForm.getId();
+                    ContentForm.NameContentForm nameContentForm = contentForm.getNameContent();
+                    ContentForm.NameContentForm nameContent = contentForm.getNameContent();
+                    String content = contentForm.getContent();
+                    statement.setLong(1, idContentForm);
+                    statement.setString(2, nameContent.toString());
+                    statement.setString(3, content);
+                    statement.addBatch();
+                }
+            }
+
+            statement.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Transactional
+    void linkButtonMenuAndContentForm() throws SQLException {
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "INSERT INTO content_menu(id_content, id_button_menu) VALUES (?, ?)")) {
+
+            for (Map.Entry<Long, Set<Long>> entry : dataContentMenuService.contentMenuIds().entrySet()) {
+                Long buttonMenuId = entry.getKey();
+                for (Long contentFormId : entry.getValue()) {
+                    statement.setLong(1, contentFormId);
+                    statement.setLong(2, buttonMenuId);
+                    statement.addBatch();
+                }
+            }
+
+            statement.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     void insertDataShelter() throws SQLException {
+
         final Connection connection = dataSource.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(
@@ -110,8 +201,8 @@ public class TransferDatabase {
                 statement.setString(6, security_contact);
                 statement.addBatch();
             }
-            statement.executeBatch();
 
+            statement.executeBatch();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
@@ -120,20 +211,23 @@ public class TransferDatabase {
     }
 
     void insertDataViewPet() throws SQLException {
+
         final Connection connection = dataSource.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO view_pets(name_view_pet) VALUES(?)")) {
+                "INSERT INTO view_pets(id_view_pet, name_view_pet) VALUES(?, ?)")) {
 
             for (Map.Entry<ViewPet.NameViewPet, ViewPet> entry : defaultDataViewPet.viewPetMap.entrySet()) {
                 ViewPet viewPet = entry.getValue();
+                long id = viewPet.getId();
                 ViewPet.NameViewPet nameViewPet = viewPet.getNameViewPet();
 
-                statement.setString(1, nameViewPet.toString());
+                statement.setLong(1, id);
+                statement.setString(2, nameViewPet.toString());
                 statement.addBatch();
             }
-            statement.executeBatch();
 
+            statement.executeBatch();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
@@ -143,8 +237,9 @@ public class TransferDatabase {
 
     void insertDataPet() throws SQLException {
 
-        try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO pets(id_shelter, id_view_pet, name_pet, busy_free, date_take) VALUES(?, ?, ?, ?, ?)")) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "INSERT INTO pets(id_shelter, id_view_pet, name_pet, busy_free, date_take) VALUES(?, ?, ?, ?, ?)")) {
 
             for (Pet pet : defaultDataPet.petList) {
                 long shelter = pet.getShelter().getId();

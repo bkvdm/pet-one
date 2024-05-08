@@ -16,6 +16,7 @@ public class ButtonMenu {
     private long id;
 
     public enum NameButtonMenu {
+
         GUEST_MENU("Гость"),
         REGISTRATION_PRODUCE("Процедура регистрации"),
         CLIENT_REGISTERED_NO_PETS("Клиент зарегистрирован, без питомцев"),
@@ -24,7 +25,8 @@ public class ButtonMenu {
         END_REPORT_CYCLE("Меню окончания цикла сдачи отчёта"),
         START_MENU("Начало"),
         END_SUCCESSFUL_REGISTRATION("Успешная регистрация клиента"),
-        END_UNSUCCESSFUL_REGISTRATION("Неуспешная регистрация клиента");
+        END_UNSUCCESSFUL_REGISTRATION("Неуспешная регистрация клиента"),
+        TRANSMISSION_EXCEPTION("Команда не распознана");
 
         private String displayName;
 
@@ -38,14 +40,13 @@ public class ButtonMenu {
     }
 
     @Enumerated(EnumType.STRING)
-//    @Column(name = "menu_name", nullable = false)
-    @Column(name = "menu_name")
+    @Column(name = "menu_name", nullable = false)
     private NameButtonMenu nameButtonMenu;
 
     @Column(name = "menu_header")
     private String menuHeader;
 
-    @ManyToMany(mappedBy = "buttonMenus")
+    @ManyToMany(mappedBy = "buttonMenus", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<ContentForm> contentForm = new HashSet<>();
 
     public ButtonMenu(NameButtonMenu nameButtonMenu, String menuHeader, Set<ContentForm> contentForm) {

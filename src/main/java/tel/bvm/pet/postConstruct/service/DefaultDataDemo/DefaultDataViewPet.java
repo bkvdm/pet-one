@@ -1,4 +1,4 @@
-package tel.bvm.pet.postConstruct;
+package tel.bvm.pet.postConstruct.service.DefaultDataDemo;
 
 import org.springframework.stereotype.Component;
 import tel.bvm.pet.model.ViewPet;
@@ -29,7 +29,7 @@ public class DefaultDataViewPet {
         throw new IllegalArgumentException("Unsupported view pet type: " + nameViewPet);
     }
 
-    Map<ViewPet.NameViewPet, ViewPet> viewPetMap = new HashMap<ViewPet.NameViewPet, ViewPet>(Map.of(
+    public Map<ViewPet.NameViewPet, ViewPet> viewPetMap = new HashMap<ViewPet.NameViewPet, ViewPet>(Map.of(
             createViewPet(ViewPet.NameViewPet.CAT).getNameViewPet(), createViewPet(ViewPet.NameViewPet.CAT),
             createViewPet(ViewPet.NameViewPet.DOG).getNameViewPet(), createViewPet(ViewPet.NameViewPet.DOG)));
 
