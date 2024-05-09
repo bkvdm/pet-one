@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -28,6 +29,7 @@ public class PictureDailyReport {
     private String mediaType;
 
     @Lob
+//    @Type(type = "org.hibernate.type.BinaryType")
     @Column(name = "data_form")
     private byte[] dataForm;
 

@@ -5,9 +5,12 @@ import jakarta.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
 
 import java.util.Arrays;
 import java.util.Objects;
+
+//import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "forms")
@@ -28,6 +31,8 @@ public class Form {
     private String mediaType;
 
     @Lob
+//    @Type(type = "org.hibernate.type.BinaryType")
+//    @Type()
     @Column(name = "data_form")
     private byte[] dataForm;
 

@@ -74,7 +74,7 @@ CREATE TABLE picture_daily_reports
 
 CREATE TABLE volunteers
 (
-    id_volunteer   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_volunteer   BIGSERIAL PRIMARY KEY,
     chat_id        BIGINT NOT NULL,
     name_volunteer VARCHAR(255),
     contact        VARCHAR(255)
