@@ -14,13 +14,29 @@ public class ViewPet {
     @Column(name = "id_view_pet")
     private long id;
 
-    @Column(name = "name_view_pet")
-    private String nameViewPet;
+    public enum NameViewPet {
+        CAT("Кошка"),
+        DOG("Собака");
+        private String displayName;
+
+        NameViewPet(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+//    public enum NameViewPet {CAT, DOG}
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name_view_pet", nullable = false)
+    private NameViewPet nameViewPet;
 
     @OneToMany(mappedBy = "viewPet")
     private List<Pet> pets;
 
-    public ViewPet(String nameViewPet, List<Pet> pets) {
+    public ViewPet(NameViewPet nameViewPet, List<Pet> pets) {
         this.nameViewPet = nameViewPet;
         this.pets = pets;
     }
@@ -36,11 +52,11 @@ public class ViewPet {
         this.id = id;
     }
 
-    public String getNameViewPet() {
+    public NameViewPet getNameViewPet() {
         return nameViewPet;
     }
 
-    public void setNameViewPet(String nameViewPet) {
+    public void setNameViewPet(NameViewPet nameViewPet) {
         this.nameViewPet = nameViewPet;
     }
 
