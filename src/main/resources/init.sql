@@ -2,7 +2,7 @@
 --changeset bkvdm:1
 CREATE TABLE clients
 (
-    id_client   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_client   BIGSERIAL PRIMARY KEY,
     chat_id     BIGINT NOT NULL,
     name_client VARCHAR(255),
     contact     VARCHAR(255)
@@ -10,7 +10,7 @@ CREATE TABLE clients
 
 CREATE TABLE shelters
 (
-    id_shelter        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_shelter        BIGSERIAL PRIMARY KEY,
     name_shelter      VARCHAR(255),
     operation_mode    VARCHAR(255),
     contact           VARCHAR(255),
@@ -21,13 +21,13 @@ CREATE TABLE shelters
 
 CREATE TABLE view_pets
 (
-    id_view_pet   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_view_pet   BIGSERIAL PRIMARY KEY,
     name_view_pet VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE pets
 (
-    id_pet      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_pet      BIGSERIAL PRIMARY KEY,
     id_shelter  BIGINT  NOT NULL,
     id_client   BIGINT,
     id_view_pet BIGINT  NOT NULL,
@@ -41,18 +41,18 @@ CREATE TABLE pets
 
 CREATE TABLE picture_pets
 (
-    id_picture_pet BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_picture_pet BIGSERIAL PRIMARY KEY,
     file_path      VARCHAR(255),
     file_size      BIGINT,
     media_type     VARCHAR(255),
-    data_form      LONGBLOB,
+    data_form      BYTEA,
     id_pet         BIGINT UNIQUE NOT NULL,
     FOREIGN KEY (id_pet) REFERENCES pets (id_pet)
 );
 
 CREATE TABLE daily_reports
 (
-    id_daily_report BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_daily_report BIGSERIAL PRIMARY KEY,
     id_pet          BIGINT    NOT NULL,
     date_time       TIMESTAMP NOT NULL,
     well            VARCHAR(255),
@@ -63,11 +63,11 @@ CREATE TABLE daily_reports
 
 CREATE TABLE picture_daily_reports
 (
-    id_picture_daily_report BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_picture_daily_report BIGSERIAL PRIMARY KEY,
     file_path               VARCHAR(255),
     file_size               BIGINT,
     media_type              VARCHAR(255),
-    data_form               LONGBLOB,
+    data_form               BYTEA,
     id_daily_report         BIGINT UNIQUE NOT NULL,
     FOREIGN KEY (id_daily_report) REFERENCES daily_reports (id_daily_report)
 );
@@ -82,18 +82,14 @@ CREATE TABLE volunteers
 
 CREATE TABLE content_forms
 (
-    id_content   BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    id_content   BIGINT PRIMARY KEY,
---     name_content VARCHAR(255) NOT NULL,
+    id_content   BIGSERIAL PRIMARY KEY,
     name_content TEXT NOT NULL,
     content      TEXT
 );
 
 CREATE TABLE button_menus
 (
-    id_button_menu BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    id_button_menu BIGINT PRIMARY KEY,
---     menu_name      VARCHAR(255) NOT NULL,
+    id_button_menu BIGSERIAL PRIMARY KEY,
     menu_name      TEXT NOT NULL,
     menu_header    TEXT
 );
@@ -109,11 +105,11 @@ CREATE TABLE content_menu
 
 CREATE TABLE forms
 (
-    id_form    BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_form    BIGSERIAL PRIMARY KEY,
     file_path  VARCHAR(255) NOT NULL,
     file_size  BIGINT       NOT NULL,
     media_type VARCHAR(255) NOT NULL,
-    data_form  LONGBLOB     NOT NULL,
+    data_form  BYTEA     NOT NULL,
     id_content BIGINT,
     UNIQUE (id_content),
     FOREIGN KEY (id_content) REFERENCES content_forms (id_content)
