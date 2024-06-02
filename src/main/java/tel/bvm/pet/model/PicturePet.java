@@ -5,14 +5,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
 @Table(name = "picture_pets")
-public class PicturePet {
+public class PicturePet implements CommonFileTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +28,8 @@ public class PicturePet {
     private String mediaType;
 
     @Lob
-//    @Type(type = "org.hibernate.type.BinaryType")
     @Column(name = "data_form")
+    @JsonIgnore
     private byte[] dataForm;
 
     @OneToOne
@@ -117,8 +116,6 @@ public class PicturePet {
                 ", filePath='" + filePath + '\'' +
                 ", fileSize=" + fileSize +
                 ", mediaType='" + mediaType + '\'' +
-                ", dataForm=" + Arrays.toString(dataForm) +
-                ", pet=" + pet +
                 '}';
     }
 }
