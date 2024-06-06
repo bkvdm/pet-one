@@ -195,4 +195,47 @@ public class PetController {
             return ResponseEntity.internalServerError().body("An internal server error occurred: " + e.getMessage());
         }
     }
+
+    /**
+     * Эндпоинт для получения идентификаторов питомцев на основе даты решений (по срокам нахождения питомцев
+     * на испытательном сроке у клиента (30, 44, 60 и более дней).
+     * Преобразует LocalDate в LocalDateTime для поиска и возвращает сведения, если результат пустой.
+     *
+     * @param date Дата, для которой пользователь хочет получить идентификаторы питомцев.
+     * @return ResponseEntity содержащий или набор идентификаторов, или сообщение об отсутствии результатов.
+     */
+    @Operation(summary = "Получение идентификаторов питомцев по дате",
+            description = "Метод для получения идентификаторов питомцев, основанный на датах принятия решений. " +
+                    "Дата преобразуется из LocalDate в LocalDateTime.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Идентификаторы питомцев успешно найдены"),
+                    @ApiResponse(responseCode = "404", description = "Питомцы не найдены для указанной даты", content = @Content),
+                    @ApiResponse(responseCode = "400", description = "Некорректный формат даты", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content)
+            })
+    @GetMapping("/decisions")
+    public ResponseEntity<?> getPetDecisionsByDate(
+            @Parameter(name = "date", description = "Дата для получения общего списка из id питомцев по которым нужно принять решение", required = true, example = "1945-05-09")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            LocalDateTime startOfDay = date.atStartOfDay();
+            Set<Long> petIds = petService.petOnDateDecision(startOfDay);
+
+            if (petIds.isEmpty()) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("На запрошенную дату отчёты отсутствуют: " + date.toString());
+            }
+
+            return ResponseEntity.ok(petIds);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Неправильный формат даты: " + date.toString());
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Произошла внутренняя ошибка на сервере.");
+        }
+    }
 }

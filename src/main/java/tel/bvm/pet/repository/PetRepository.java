@@ -8,6 +8,7 @@ import tel.bvm.pet.model.Pet;
 import tel.bvm.pet.model.ViewPet;
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -113,4 +114,24 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
      */
     @Query("SELECT p.client.id FROM Pet p WHERE p.id = :idPet")
     Set<Long> findClientIdByPetId(@Param("idPet") Long idPet);
+
+    /**Дата принятия решения об усыновлении питомца, продлении испытательного срока
+     *                     или возврата питомца в приют
+     *                     (для ситуаций 30 и 44 дня, нахождения питомца у клиента на испытательном сроке)
+     * @param startDateTime Начало интервала даты и времени
+     * @param endDateTime Конец интервала даты и времени
+     */
+    @Query("SELECT p FROM Pet p WHERE p.busyFree = true AND p.dateTake BETWEEN :startDateTime AND :endDateTime")
+    Set<Pet> findAllByBusyFreeAndDateTakeBetween(@Param("startDateTime") LocalDateTime startDateTime,
+                                                 @Param("endDateTime") LocalDateTime endDateTime);
+
+    /**
+     * @param dateDecision Дата принятия решения об усыновлении питомца или воврата питомца в приют
+     *                     (для ситуаций от 60 и более дней, нахождения питомца у клиента на испытательном сроке)
+     */
+    @Query("SELECT p FROM Pet p WHERE p.busyFree = true AND p.dateTake <= :dateDecision")
+    Set<Pet> findAllByBusyFreeAndDateTakeLessThanOrEqualTo(@Param("dateDecision") LocalDateTime dateDecision);
+//    Set<Pet> findByBusyFreeTrueAndDateTakeLessThanEqual(LocalDateTime dateDecision);
+
+
 }

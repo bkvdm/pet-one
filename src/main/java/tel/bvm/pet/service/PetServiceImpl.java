@@ -513,4 +513,70 @@ public class PetServiceImpl implements PetService {
 
         return dailyReportRepository.countByDateTimeBetween(startOfDay, endOfDay) > 0;
     }
+
+    /**
+     * Получает набор {@link Pet}, дата усыновления (dateTake) которых приходится на начало и конец конкретного дня.
+     * Конкретно используется для питомцев с периодом решения от 30 до 44 дней, находящихся на испытательном сроке.
+     *
+     * @param localDateTime Время и дата, в которую должно быть принято решение.
+     * @return Набор объектов {@link Pet}.
+     * @throws IllegalArgumentException Если список питомцев пуст на указанную дату.
+     */
+    public Set<Pet> renewAdoptReturnPet(LocalDateTime localDateTime) {
+
+        LocalDateTime startOfDay = localDateTime.toLocalDate().atStartOfDay(); // Начало дня
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1); // Конец дня
+
+        Set<Pet> starterPetGroup = petRepository.findAllByBusyFreeAndDateTakeBetween(startOfDay, endOfDay);
+
+        if (starterPetGroup.isEmpty()) {
+//            throw new IllegalArgumentException("Pet list is empty as of date: " + localDateTime.toLocalDate());
+            logger.info("Pet list (30 or 44 days) is empty as of date: {}", localDateTime.toLocalDate());
+        }
+        return starterPetGroup;
+    }
+
+    /**
+     * Получает набор {@link Pet} с датой усыновления (dateTake), равной или более поздней, чем указанный LocalDateTime.
+     * Этот метод используется для ситуаций, когда испытательный срок питомца составляет 60 и более дней.
+     *
+     * @param localDateTime Нижняя граница даты и времени для возврата питомцев, находящихся на испытательном сроке.
+     * @return Набор объектов {@link Pet}.
+     * @throws IllegalArgumentException Если список питомцев пуст на указанную дату.
+     */
+    public Set<Pet> adoptReturnPet(LocalDateTime localDateTime) {
+//        Set<Pet> ultimatePetGroup = petRepository.findAllByBusyFreeAndDateTakeLessThanOrEqualTo(localDateTime);
+        Set<Pet> ultimatePetGroup = petRepository.findAllByBusyFreeAndDateTakeLessThanOrEqualTo(localDateTime);
+
+        if (ultimatePetGroup.isEmpty()) {
+//            throw new IllegalArgumentException("Pet list is empty as of date: " + localDateTime.toLocalDate());
+            logger.info("Pet list (60 days or more) is empty as of date: {}", localDateTime.toLocalDate());
+        }
+        return ultimatePetGroup;
+    }
+
+    /**
+     * Определяет идентификаторы питомцев на основе принятых решений в различные временные интервалы, определенные dayDecision.
+     * Объединяет результаты методов renewAdoptReturnPet и adoptReturnPet для различных сроков принятия решений.
+     *
+     * @param localDateTime Время и дата начала периода принятия решений.
+     * @return Объединенный набор идентификаторов питомцев из методов renewAdoptReturnPet и adoptReturnPet.
+     */
+    @Override
+    public Set<Long> petOnDateDecision(LocalDateTime localDateTime) {
+        Set<Integer> dayDecision = Set.of(60, 44, 30);
+
+        Set<Long> petIds = new HashSet<>();
+
+        for (Integer day : dayDecision) {
+            Set<Pet> pets = (day == 60) ? adoptReturnPet(localDateTime.minusDays(day))
+                    : renewAdoptReturnPet(localDateTime.minusDays(day));
+            petIds.addAll(pets.stream()
+                    .map(Pet::getId)
+                    .collect(Collectors.toSet()));
+        }
+        System.out.println(petIds.toString());
+        return petIds;
+    }
+
 }

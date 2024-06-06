@@ -31,4 +31,6 @@ public interface PetService {
     void dailyReportPreCheckMessages(LocalDateTime localDateTime);
 
     Boolean checkIfReportsExistForDate(LocalDateTime localDateTime);
+
+    Set<Long> petOnDateDecision(LocalDateTime localDateTime);
 }
