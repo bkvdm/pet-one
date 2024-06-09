@@ -4,11 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import tel.bvm.pet.model.FragmentNameText;
 import tel.bvm.pet.model.Pet;
 import tel.bvm.pet.model.PetDto;
@@ -18,10 +21,10 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 @RestController
@@ -34,6 +37,8 @@ public class PetController {
     public PetController(PetService petService) {
         this.petService = petService;
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(PetController.class);
 
     /**
      * Возвращает страницу со списком питомцев доступных для усыновления (всех видов).
@@ -204,7 +209,7 @@ public class PetController {
      * @param date Дата, для которой пользователь хочет получить идентификаторы питомцев.
      * @return ResponseEntity содержащий или набор идентификаторов, или сообщение об отсутствии результатов.
      */
-    @Operation(summary = "Получение идентификаторов питомцев по дате",
+    @Operation(summary = "Получение идентификаторов питомцев по дате, для которых нужно принять решение (усыновить, продлить испытательный срок или вернуть питомца в приют)",
             description = "Метод для получения идентификаторов питомцев, основанный на датах принятия решений. " +
                     "Дата преобразуется из LocalDate в LocalDateTime.",
             responses = {
@@ -219,7 +224,8 @@ public class PetController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         try {
             LocalDateTime startOfDay = date.atStartOfDay();
-            Set<Long> petIds = petService.petOnDateDecision(startOfDay);
+            Set<Long> petIdsSet = petService.petOnDateDecision(startOfDay);
+            List<Long> petIds = new ArrayList<>(petIdsSet);
 
             if (petIds.isEmpty()) {
                 return ResponseEntity
@@ -233,9 +239,145 @@ public class PetController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Неправильный формат даты: " + date.toString());
         } catch (Exception e) {
+            logger.error("Логгирование ошибки при обработке запроса для даты: {}", date, e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Произошла внутренняя ошибка на сервере.");
+        }
+    }
+
+    /**
+     * Эндпоинт для усыновленния питомцев на определенную дату.
+     * Принимает дату и набор идентификаторов питомцев в теле запроса.
+     *
+     * @param date           Дата, для которой нужно оформить усыновление питомцев.
+     * @param obtainedIdPets Набор идентификаторов питомцев, для которых выполняется подсчет.
+     * @return ResponseEntity с количеством успешно усыновленных питомцев или сообщением об ошибке.
+     */
+    @PostMapping("/pets/successful-adoptions")
+    @Operation(summary = "Оформление факта усыновления питомцев",
+            description = "Этот метод принимает дату и набор идентификаторов питомцев для оформления усыновления. " +
+                    "На основе этой информации подсчитывается количество успешно усыновленных питомцев.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Количество успешно усыновленных питомцев"),
+                    @ApiResponse(responseCode = "400", description = "Проблемы с входными данными", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content)
+            })
+    public ResponseEntity<?> countSuccessfullyAdoptedPets(
+            @RequestParam @Parameter(description = "Набор идентификаторов питомцев обособленно в каждой ячейке")
+            Set<Long> obtainedIdPets,
+            @Parameter(name = "date", description = "Дата для операции", required = true, example = "1945-05-09")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+            String result = petService.countSuccessfullyAdoptionPet(obtainedIdPets, endOfDay);
+            return ResponseEntity.ok(result);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Неправильный формат даты: " + date.toString());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Произошла внутренняя ошибка на сервере.");
+        }
+    }
+
+    /**
+     * Эндпоинт для возвращения питомцев в приют или продления испытательного периода.
+     * Принимает идентификаторы питомцев и дату операции.
+     *
+     * @param ids Идентификаторы питомцев для операции.
+     * @param date Дата, для которой пользователь хочет принять решение.
+     * @return ResponseEntity с сообщением о результате операции.
+     */
+    @Operation(summary = "Возврат питомцев в приют или продление испытательного периода",
+            description = "Этот метод позволяет определить питомцев, которых нужно вернуть в приют или для которых необходимо продлить испытательный срок, " +
+                    "основываясь на предоставленных идентификаторах и дате.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Операция успешно выполнена"),
+                    @ApiResponse(responseCode = "400", description = "Проблемы с входными данными", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content)
+            })
+    @PostMapping("/pets/decisions")
+    public ResponseEntity<?> handlePetDecision(
+            @RequestParam @Parameter(description = "Набор идентификаторов питомцев обособленно в каждой ячейке")
+            Set<Long> ids,
+            @Parameter(name = "date", description = "Дата события", required = true, example = "1945-05-09")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            LocalDateTime operationDateTime = date.atStartOfDay();
+            String result = petService.returningPetToShelterOrExtendingProbationPeriod(ids, operationDateTime);
+            return ResponseEntity.ok(result);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Неправильный формат даты: " + date.toString());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Ошибка при обработке запроса на дату: {}", date, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Произошла внутренняя ошибка на сервере.");
+        }
+    }
+
+    /**
+     * Принимает запрос на возврат питомцев в приют от клиента.
+     * <p>Этот метод обрабатывает набор идентификаторов питомцев, которые клиент хочет вернуть в приют.
+     * Питомцы, отвечающие критериям возврата, удаляются из списка владения клиентов.</p>
+     *
+     * @param idPetForTransfer идентификаторы питомцев, которые должны быть возвращены в приют.
+     * @return ResponseEntity со строкой, содержащей результат операции возврата.
+     * @throws ResponseStatusException с кодом {@code HttpStatus.NOT_FOUND}, если нет питомцев, отвечающих критериям возврата.
+     * @throws ResponseStatusException с кодом {@code HttpStatus.BAD_REQUEST}, если предоставлены недопустимые идентификаторы питомцев.
+     * @throws ResponseStatusException с кодом {@code HttpStatus.INTERNAL_SERVER_ERROR}, в случае внутренней ошибки сервера.
+     */
+    @PostMapping("/transfer-pet-from-client")
+    @Operation(summary = "Возврат питомцев в приют от клиента",
+            description = "Принимает набор идентификаторов питомцев для возврата и обрабатывает запрос на их возврат в приют. " +
+                    "Возвращает информацию об успешно возвращенных и о питомцах, которые не могут быть возвращены.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Питомцы успешно возвращены в приют"),
+                    @ApiResponse(responseCode = "404", description = "Не найдены питомцы, соответствующие критериям возврата", content = @Content),
+                    @ApiResponse(responseCode = "400", description = "Недопустимые идентификаторы питомцев", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content)
+            })
+    public ResponseEntity<String> transferPetToShelter(
+            @RequestParam @Parameter(description = "Набор идентификаторов питомцев обособленно в каждой ячейке")
+            Set<Long> idPetForTransfer) {
+        try {
+            String result = petService.transferPetToShelterByClient(idPetForTransfer);
+            return ResponseEntity.ok(result);
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не найдены питомцы для возврата", e);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Недопустимые идентификаторы питомцев", e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Внутренняя ошибка сервера", e);
+        }
+    }
+
+    /**
+     * Эндпоинт для передачи питомца клиенту на испытательный период.
+     *
+     * @param idPet    Идентификатор питомца, который будет передан.
+     * @param idClient Идентификатор клиента, которому питомец будет передан.
+     * @param localDate Дата, когда испытательный период начнется. Формат: 'yyyy-MM-dd', например, '1945-05-09'.
+     * @return ResponseEntity со статусом выполнения операции.
+     */
+    @PostMapping("/transfer-pet-to-client")
+    @Operation(summary = "Передача питомца клиенту на испытательный период",
+            description = "Принимает идентификаторы питомца и клиента, а также дату начала испытательного периода (в формате 'yyyy-MM-dd', например, '1945-05-09'). Выполняет передачу питомца клиенту на заданный период. Время для 'dateTake' конвертируется в начало дня.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Питомец успешно передан клиенту на испытательный период"),
+                    @ApiResponse(responseCode = "400", description = "Недопустимые параметры запроса или питомец/клиент не найдены", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content)
+            })
+    public ResponseEntity<?> transferPetToClient(@RequestParam long idPet, @RequestParam long idClient,
+                                                 @RequestParam @Parameter(description = "Дата передачи питомца клиенту на испытательный срок в формате 1945-05-09")
+                                                 LocalDate localDate) {
+        try {
+            LocalDateTime dateTake = localDate.atStartOfDay();
+            petService.transferPetToClientForProbationaryPeriod(idPet, idClient, dateTake);
+            return ResponseEntity.ok("Pet has been successfully transferred to the client for probationary period.");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("An error occurred during the transfer operation: " + e.getMessage());
         }
     }
 }

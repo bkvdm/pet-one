@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tel.bvm.pet.model.*;
 import tel.bvm.pet.receiver.PackListToPageService;
-import tel.bvm.pet.repository.DailyReportRepository;
-import tel.bvm.pet.repository.PetRepository;
-import tel.bvm.pet.repository.ShelterRepository;
-import tel.bvm.pet.repository.ViewPetRepository;
+import tel.bvm.pet.repository.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,13 +25,15 @@ public class PetServiceImpl implements PetService {
     private final ShelterRepository shelterRepository;
     private final ViewPetRepository viewPetRepository;
     private final DailyReportRepository dailyReportRepository;
+    private final ClientRepository clientRepository;
 
-    public PetServiceImpl(PetRepository petRepository, PackListToPageService packListToPageService, ShelterRepository shelterRepository, ViewPetRepository viewPetRepository, DailyReportRepository dailyReportRepository) {
+    public PetServiceImpl(PetRepository petRepository, PackListToPageService packListToPageService, ShelterRepository shelterRepository, ViewPetRepository viewPetRepository, DailyReportRepository dailyReportRepository, ClientRepository clientRepository) {
         this.petRepository = petRepository;
         this.packListToPageService = packListToPageService;
         this.shelterRepository = shelterRepository;
         this.viewPetRepository = viewPetRepository;
         this.dailyReportRepository = dailyReportRepository;
+        this.clientRepository = clientRepository;
     }
 
     Logger logger = LoggerFactory.getLogger(PetServiceImpl.class);
@@ -524,8 +523,8 @@ public class PetServiceImpl implements PetService {
      */
     public Set<Pet> renewAdoptReturnPet(LocalDateTime localDateTime) {
 
-        LocalDateTime startOfDay = localDateTime.toLocalDate().atStartOfDay(); // Начало дня
-        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1); // Конец дня
+        LocalDateTime startOfDay = localDateTime.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
 
         Set<Pet> starterPetGroup = petRepository.findAllByBusyFreeAndDateTakeBetween(startOfDay, endOfDay);
 
@@ -575,8 +574,187 @@ public class PetServiceImpl implements PetService {
                     .map(Pet::getId)
                     .collect(Collectors.toSet()));
         }
-        System.out.println(petIds.toString());
         return petIds;
     }
 
+    /**
+     * Усыновление питомцев на определённую дату по списку idPet,
+     * подсчёт количества успешно усыновленных питомцев из списка полученных idPet на указанную дату.
+     * Метод проверяет доступность питомцев для усыновления (основываясь на их текущем статусе,
+     * который должен быть помечен как "свободен": об этом указывает булево "busy_free")
+     * и принятие решения об усыновлении, список которых получает волонтёр из другого эндпоинта
+     * /decisions (getPetDecisionsByDate) на основе даты и списка ID питомцев.
+     *
+     * @param obtainedIdPets Множество идентификаторов питомцев, подлежащих проверке.
+     * @param localDateTime  Дата и время, на которые должно быть принято решение об усыновлении.
+     * @return Строка, содержащая информацию о количестве успешно усыновленных питомцев и ID клиентов,
+     * которым эти питомцы были усыновлены. В случае отсутствия свободных питомцев выбрасывает исключение.
+     * @throws NoSuchElementException если не найдено свободных питомцев для усыновления.
+     */
+    @Override
+    public String countSuccessfullyAdoptionPet(Set<Long> obtainedIdPets, LocalDateTime localDateTime) {
+        Set<Long> availableIdPets = petRepository.findIdsByBusyFree(true);
+
+        Set<Long> adoptivePetClientId = new HashSet<>();
+
+        if (availableIdPets.isEmpty()) {
+            throw new NoSuchElementException("No free pets found");
+        }
+
+        Set<Long> decisionPetsIds = petOnDateDecision(localDateTime);
+
+        for (Long idPet : obtainedIdPets) {
+            if (availableIdPets.contains(idPet) && decisionPetsIds.contains(idPet)) {
+                petRepository.updateBusyFreeStatusById(false, idPet);
+                petRepository.findClientIdByPetId(idPet).ifPresentOrElse(
+                        clientId -> {
+                            adoptivePetClientId.add(clientId);
+                            //TODO здесь нужно отправить сообщение клиентам, получить их chartId, с поздравлением об усыновлении с именем контента: CONGRATULATION_ADOPTION
+                        },
+                        () -> logger.warn("Клиент для питомца с ID: {} не найден.", idPet)
+                );
+            } else {
+                logger.info("A pet with this ID {} number cannot be adopted in this date {} ", idPet, localDateTime.toLocalDate());
+            }
+        }
+
+        return "Количество усыновлённых питомцев из возможных, по предложенному списку, равно: "
+                + adoptivePetClientId.size() + ". "
+                + "Поздравление с усыновлением отправлены клиентам с идентификатором id: " + adoptivePetClientId.toString();
+    }
+
+    /**
+     * Обрабатывает возврат питомцев в приют или продление испытательного срока,
+     * для питомцев 30 или 44 день: продление возврат,
+     * для питомцев 60 дней испытательного срока, только возврат.
+     *
+     * <p>Для питомцев из предоставленного набора id питомцев данная процедура проверяет,
+     * готовы ли они к усыновлению и соответствуют ли указанной дате принятия решения.
+     * Если условия выполнены, статус питомца обновляется, и планируется отправка сообщения
+     * о возврате в приют соответствующим клиентам.</p>
+     *
+     * <p>Дополнительно, для питомцев, находящихся на испытательном сроке, происходит
+     * проверка возможности продления этого срока и отправка соответствующих уведомлений.</p>
+     *
+     * @param obtainedIdPets Набор ID питомцев для обработки.
+     * @param localDateTime  Дата, на основании которой производится проверка и решение.
+     * @return Строка с информацией о количестве питомцев, требующих действий, и отпраленных сообщениях.
+     * @throws NoSuchElementException Если в системе не найдены питомцы, готовые к усыновлению.
+     */
+    @Override
+    public String returningPetToShelterOrExtendingProbationPeriod(Set<Long> obtainedIdPets, LocalDateTime localDateTime) {
+        Set<Long> availableIdPets = petRepository.findIdsOfPetsReadyForAdoption();
+
+        Set<Long> returnPetClientId = new HashSet<>();
+
+        if (availableIdPets.isEmpty()) {
+            throw new NoSuchElementException("No free pets found");
+        }
+
+        Set<Long> decisionPetsIds = petOnDateDecision(localDateTime);
+
+        for (Long idPet : obtainedIdPets) {
+            if (availableIdPets.contains(idPet) && decisionPetsIds.contains(idPet)) {
+                petRepository.updatePetStatusAndClearDateTake(idPet);
+                petRepository.findClientIdByPetId(idPet).ifPresentOrElse(
+                        clientId -> {
+                            returnPetClientId.add(clientId);
+                            //TODO здесь нужно отправить сообщение клиентам, получить их chartId, с сообщением о необходимости возврата питомца в приют RETURN_INSTRUCTION
+                        },
+                        () -> logger.warn("Клиент для питомца с ID: {} не найден.", idPet)
+                );
+            } else {
+                logger.info("A pet with this ID {} number cannot be adopted in this date {} ", idPet, localDateTime.toLocalDate());
+            }
+        }
+
+        Set<Pet> petsExtendProbationPeriod = renewAdoptReturnPet(localDateTime);
+
+        Set<Long> idClientForPetsRenew = petsExtendProbationPeriod.stream()
+                .filter(pet -> pet.getClient() != null)
+                .map(pet -> pet.getClient().getId())
+                .collect(Collectors.toSet());
+        //TODO здесь нужно отправить сообщение клиентам, у которых наступил 30 или 44 день испытательного срока, для его продления
+
+        return "Количество питомцев, которых необходимо вернуть, прервав испытательный срок (на 30 или 44 день), по предложенному списку, равно: "
+                + returnPetClientId.size() + ". Клиентам этих питомцев с id " + returnPetClientId.toString() + " отправлены ообщения о возврате питомца в приют с инструкцией по возврату."
+                + "Информация о продлении испытательного срока отравлены " + idClientForPetsRenew.size() + " клиентам с идентификатором id: " + idClientForPetsRenew.toString();
+    }
+
+    /**
+     * Осуществляет передачу питомцев обратно в приют пользователем.
+     * Метод проверяет, могут ли заданные питомцы быть возвращены в приют на основании текущего статуса,
+     * и обрабатывает возврат питомцев, соответствующих критериям.
+     *
+     * @param idPetForTransfer набор идентификаторов питомцев, которые пользователь желает вернуть в приют.
+     * @return строка, сообщающая о результатах операции, включая идентификаторы успешно возвращенных питомцев,
+     * и идентификаторы питомцев, которые не могут быть возвращены.
+     * @throws NoSuchElementException если в базе данных нет питомцев, подходящих под заданные критерии для возврата.
+     */
+    @Override
+    public String transferPetToShelterByClient(Set<Long> idPetForTransfer) {
+
+        Set<Long> petIdForCustomerReturns = petRepository.findAvailablePetIds();
+
+        if (petIdForCustomerReturns.isEmpty()) {
+            throw new NoSuchElementException("There are no pets that can be returned to the shelter");
+        }
+
+        Set<Long> returnedPetIds = new HashSet<>();
+        Set<Long> petIdsCanNotBeReturned = new HashSet<>();
+
+        for (Long idPet : idPetForTransfer) {
+            if (petIdForCustomerReturns.contains(idPet)) {
+                returnedPetIds.add(idPet);
+                petRepository.disconnectPetFromClient(idPet);
+            } else {
+                logger.info("Pets with these IDs {} cannot be returned to the shelter", idPet);
+                petIdsCanNotBeReturned.add(idPet);
+            }
+        }
+
+        return String.format("Питомцы с идентификаторами %s, возвращены в приют." +
+                "Питомцы с идентификаторами %s не могут быть возвращены, " +
+                "либо значения id питомца переданы не корректные, " +
+                "поскольку данные в таблице питомцев с такими id в базе данных не имеют требуемых параметров исполнить возврат", returnedPetIds.toString(), petIdsCanNotBeReturned.toString());
+    }
+
+    /**
+     * Производит перевод питомца в оперативное управление клиента на испытательный период.
+     * Передает питомца клиенту, если оба доступны (питомец не занят и клиент существует).
+     *
+     * @param idPet    Идентификатор питомца, который передается клиенту.
+     * @param idClient Идентификатор клиента, которому передается питомец.
+     * @param dateTake Дата начала испытательного периода владения питомцем.
+     * @throws NoSuchElementException если нет доступных питомцев для передачи или список клиентов пуст.
+     */
+    @Override
+    public void transferPetToClientForProbationaryPeriod(long idPet, long idClient, LocalDateTime dateTake) {
+
+        logger.info("Attempting to transfer pet with id {} to client with id {} on date {}", idPet, idClient, dateTake);
+
+        Set<Long> availablePetsId = petRepository.findAvailablePetsId();
+        if (availablePetsId.isEmpty()) {
+            logger.warn("Transfer failed: No pets available for transfer to the client");
+            throw new NoSuchElementException("No pets available for transfer to the client");
+        }
+
+        Set<Long> availableClientsId = clientRepository.findAllClientIds();
+        if (availableClientsId.isEmpty()) {
+            logger.warn("Transfer failed: Client's list is empty");
+            throw new NoSuchElementException("Client's list is empty");
+        }
+
+        if (availablePetsId.contains(idPet) && availableClientsId.contains(idClient)) {
+            petRepository.updatePetClientAndDateTake(idPet, idClient, dateTake);
+            logger.info("Successfully transferred pet with id {} to client with id {} on date {}", idPet, idClient, dateTake);
+        } else {
+            if (!availablePetsId.contains(idPet)) {
+                logger.warn("Transfer failed: Pet with id {} not available for transfer", idPet);
+            }
+            if (!availableClientsId.contains(idClient)) {
+                logger.warn("Transfer failed: Client with id {} not found in available clients list", idClient);
+            }
+        }
+    }
 }

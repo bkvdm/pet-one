@@ -122,7 +122,8 @@ public class Shelter {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nameShelter, operationMode, contact, address, drillingDirector, security_contact, pets);
+//        return Objects.hash(id, nameShelter, operationMode, contact, address, drillingDirector, security_contact, pets);
+        return Objects.hash(id, nameShelter);
     }
 
     @Override

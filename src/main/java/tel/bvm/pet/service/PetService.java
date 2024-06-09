@@ -33,4 +33,12 @@ public interface PetService {
     Boolean checkIfReportsExistForDate(LocalDateTime localDateTime);
 
     Set<Long> petOnDateDecision(LocalDateTime localDateTime);
+
+    String countSuccessfullyAdoptionPet(Set<Long> obtainedIdPets, LocalDateTime localDateTime);
+
+    String returningPetToShelterOrExtendingProbationPeriod(Set<Long> obtainedIdPets, LocalDateTime localDateTime);
+
+    String transferPetToShelterByClient(Set<Long> idPetForTransfer);
+
+    void transferPetToClientForProbationaryPeriod(long idPet, long idClient, LocalDateTime dateTake);
 }

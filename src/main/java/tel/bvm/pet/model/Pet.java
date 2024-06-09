@@ -145,7 +145,8 @@ public class Pet {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, shelter, client, viewPet, namePet, busyFree, dateTake, dailyReports, picturePet);
+//        return Objects.hash(id, shelter, client, viewPet, namePet, busyFree, dateTake, dailyReports, picturePet);
+        return Objects.hash(id, namePet);
     }
 
     @Override
