@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: classpath:changelog.xml
+#      file: classpath:init.sql
