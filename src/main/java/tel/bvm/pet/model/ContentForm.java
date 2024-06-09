@@ -62,6 +62,7 @@ public class ContentForm {
         CONGRATULATION_ADOPTION("Поздравление с усыновлением питомца"),
 
         // Команды по циклу приёма данных для ежедневного отчёте
+        ID_PET_DAILY_REPORT("Id питомца для отчёта"),
         PICTURE_DAILY_REPORT("Фото питомца для отчёта"),
         RATION_DAILY_REPORT("Рацион питомца для отчёта"),
         HEALTH_DAILY_REPORT("Самочувствие питомца для отчёта"),

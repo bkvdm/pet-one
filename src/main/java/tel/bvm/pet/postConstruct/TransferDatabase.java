@@ -47,7 +47,7 @@ public class TransferDatabase {
     void init() throws SQLException {
 
         // Методы закомментированы после отработки и загрузки данных в базу данных
-//
+
 //        setupDataVolunteer();
 //        setupDataClient();
 //        setupMenu();

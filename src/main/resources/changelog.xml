@@ -150,7 +150,7 @@
         <sql>
             CREATE TABLE volunteers
             (
-                id_volunteer   BIGINT AUTO_INCREMENT PRIMARY KEY,
+                id_volunteer   BIGSERIAL PRIMARY KEY,
                 chat_id        BIGINT NOT NULL,
                 name_volunteer VARCHAR(255),
                 contact        VARCHAR(255)
@@ -229,4 +229,13 @@
         </sql>
     </changeSet>
 
+    <changeSet id="13" author="bkvdm">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="volunteers" columnName="last_assigned"/>
+        </preConditions>
+        <addColumn tableName="volunteers">
+            <column name="last_assigned" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+    
 </databaseChangeLog>

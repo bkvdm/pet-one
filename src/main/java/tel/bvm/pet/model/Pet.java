@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,6 +42,7 @@ public class Pet {
     private LocalDateTime dateTake;
 
     @OneToMany(mappedBy = "pet")
+    @JsonIgnore
     private List<DailyReport> dailyReports;
 
     @OneToOne(mappedBy = "pet")
@@ -145,21 +145,17 @@ public class Pet {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, shelter, client, viewPet, namePet, busyFree, dateTake, dailyReports, picturePet);
+//        return Objects.hash(id, shelter, client, viewPet, namePet, busyFree, dateTake, dailyReports, picturePet);
+        return Objects.hash(id, namePet);
     }
 
     @Override
     public String toString() {
         return "Pet{" +
                 "id=" + id +
-                ", shelter=" + shelter +
-                ", client=" + client +
-                ", viewPet=" + viewPet +
                 ", namePet='" + namePet + '\'' +
                 ", busyFree=" + busyFree +
                 ", dateTake=" + dateTake +
-                ", dailyReports=" + dailyReports +
-                ", picturePet=" + picturePet +
                 '}';
     }
 }

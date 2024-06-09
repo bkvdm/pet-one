@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "forms")
-public class Form {
+public class Form implements CommonFileTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

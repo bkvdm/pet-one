@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "picture_daily_reports")
-public class PictureDailyReport {
+public class PictureDailyReport implements CommonFileTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

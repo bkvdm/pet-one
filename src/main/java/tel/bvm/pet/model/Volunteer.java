@@ -2,6 +2,7 @@ package tel.bvm.pet.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -22,13 +23,25 @@ public class Volunteer {
     @Column(name = "contact")
     private String contact;
 
-    public Volunteer(long chatId, String nameVolunteer, String contact) {
+    @Column(name = "last_assigned")
+    private LocalDateTime lastAssigned;
+
+    public Volunteer(long chatId, String nameVolunteer, String contact, LocalDateTime lastAssigned) {
         this.chatId = chatId;
         this.nameVolunteer = nameVolunteer;
         this.contact = contact;
+        this.lastAssigned = lastAssigned;
     }
 
     public Volunteer() {
+    }
+
+    public LocalDateTime getLastAssigned() {
+        return lastAssigned;
+    }
+
+    public void setLastAssigned(LocalDateTime lastAssigned) {
+        this.lastAssigned = lastAssigned;
     }
 
     public long getId() {
@@ -64,16 +77,16 @@ public class Volunteer {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Volunteer volunteer = (Volunteer) o;
-        return id == volunteer.id && chatId == volunteer.chatId && Objects.equals(nameVolunteer, volunteer.nameVolunteer) && Objects.equals(contact, volunteer.contact);
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Volunteer volunteer = (Volunteer) object;
+        return id == volunteer.id && chatId == volunteer.chatId && Objects.equals(nameVolunteer, volunteer.nameVolunteer) && Objects.equals(contact, volunteer.contact) && Objects.equals(lastAssigned, volunteer.lastAssigned);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chatId, nameVolunteer, contact);
+        return Objects.hash(id, chatId, nameVolunteer, contact, lastAssigned);
     }
 
     @Override
@@ -83,6 +96,7 @@ public class Volunteer {
                 ", chatId=" + chatId +
                 ", nameVolunteer='" + nameVolunteer + '\'' +
                 ", contact='" + contact + '\'' +
+                ", lastAssigned=" + lastAssigned +
                 '}';
     }
 }

@@ -27,7 +27,6 @@ public class ViewPet {
             return displayName;
         }
     }
-//    public enum NameViewPet {CAT, DOG}
 
     @Enumerated(EnumType.STRING)
     @Column(name = "name_view_pet", nullable = false)
